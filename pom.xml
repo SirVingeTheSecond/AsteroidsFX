@@ -20,6 +20,7 @@
         <module>Asteroids</module>
         <module>Collision</module>
         <module>ScoringSystem</module>
+        <module>Enemy</module>
     </modules>
     <properties>
         <java>java</java>
