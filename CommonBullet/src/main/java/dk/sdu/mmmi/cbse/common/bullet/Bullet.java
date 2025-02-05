@@ -9,7 +9,7 @@ public class Bullet extends Entity {
 
     public enum BulletType {
         PLAYER(2.0f, 600),  // 10 seconds at 60 FPS
-        ENEMY(1.0f, 600);   // 10 seconds at 60 FPS
+        ENEMY(2.0f, 600);   // 10 seconds at 60 FPS
 
         private final float speed;
         private final int lifetime;

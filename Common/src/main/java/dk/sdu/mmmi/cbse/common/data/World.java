@@ -31,7 +31,8 @@ public class World {
         return entityMap.values();
     }
 
-    public <E extends Entity> List<Entity> getEntities(Class<E>... entityTypes) {
+    @SafeVarargs
+    public final <E extends Entity> List<Entity> getEntities(Class<E>... entityTypes) {
         List<Entity> r = new ArrayList<>();
         for (Entity e : getEntities()) {
             for (Class<E> entityType : entityTypes) {

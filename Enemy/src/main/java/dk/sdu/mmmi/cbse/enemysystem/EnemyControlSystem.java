@@ -13,7 +13,7 @@ import static java.util.stream.Collectors.toList;
 
 public class EnemyControlSystem implements IEntityProcessingService {
     private final Random random = new Random();
-    private static final float ENEMY_SPEED = 0.5f;
+    private static final float ENEMY_SPEED = 1.2f;
     private static final int MOVEMENT_UPDATE_INTERVAL = 180;
     private static final int SHOOTING_INTERVAL = 180;
     private static final float MAX_ROTATION_CHANGE = 45.0f;
@@ -21,7 +21,9 @@ public class EnemyControlSystem implements IEntityProcessingService {
 
     @Override
     public void process(GameData gameData, World world) {
-        for (Entity enemy : world.getEntities(EnemyShip.class)) {
+        var enemies = world.getEntities(EnemyShip.class);
+
+        for (Entity enemy : enemies) {
             EnemyShip enemyShip = (EnemyShip) enemy;
             updateTimers(enemyShip);
 
@@ -29,8 +31,9 @@ public class EnemyControlSystem implements IEntityProcessingService {
             if (isNearEdge(enemyShip, gameData)) {
                 updateDirectionAwayFromEdge(enemyShip, gameData);
             }
+
             // Regular movement pattern
-            else if (enemyShip.getMoveTimer() <= 0) {
+            if (enemyShip.getMoveTimer() <= 0) {
                 updateMovementDirection(enemyShip);
             }
 
@@ -59,13 +62,13 @@ public class EnemyControlSystem implements IEntityProcessingService {
         // Calculate angle towards center
         double dx = centerX - enemy.getX();
         double dy = centerY - enemy.getY();
+
         double angleToCenter = Math.toDegrees(Math.atan2(dy, dx));
 
-        // Add some randomness to the new direction (-30 to +30 degrees)
         angleToCenter += (random.nextDouble() - 0.5) * 60;
 
-        // Keep angle between 0 and 360
-        angleToCenter = (angleToCenter + 360) % 360;
+        // Ensure that we are between 0 and 360 degrees
+        angleToCenter = angleToCenter % 360;
 
         enemy.setRotation(angleToCenter);
         enemy.setMoveTimer(MOVEMENT_UPDATE_INTERVAL);

@@ -6,12 +6,16 @@ import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 
 public class EnemyPlugin implements IGamePluginService {
+    private static final int ENEMIES_TO_SPAWN = 3;
     private Entity enemy;
 
     @Override
     public void start(GameData gameData, World world) {
-        enemy = createEnemyShip(gameData);
-        world.addEntity(enemy);
+        for (int i = 0; i < ENEMIES_TO_SPAWN; i++)
+        {
+            enemy = createEnemyShip(gameData);
+            world.addEntity(enemy);
+        }
     }
 
     private Entity createEnemyShip(GameData gameData) {

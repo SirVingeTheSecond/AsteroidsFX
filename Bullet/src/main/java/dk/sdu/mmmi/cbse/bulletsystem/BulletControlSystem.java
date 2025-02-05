@@ -32,7 +32,6 @@ public class BulletControlSystem implements IEntityProcessingService, BulletSPI 
             // Remove bullets that are either expired or out of bounds
             if (bullet.getRemainingLifetime() <= 0 || isOutOfBounds(bullet, gameData)) {
                 bulletsToRemove.add(bullet);
-                continue;
             }
         }
 
