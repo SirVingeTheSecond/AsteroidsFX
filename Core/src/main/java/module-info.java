@@ -5,6 +5,7 @@ module Core {
     requires spring.context;
     requires spring.core;
     requires spring.beans;
+    requires java.desktop;
 
     exports dk.sdu.mmmi.cbse.main;
 

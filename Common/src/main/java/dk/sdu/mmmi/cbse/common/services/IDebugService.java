@@ -9,5 +9,5 @@ import javafx.scene.canvas.GraphicsContext;
 public interface IDebugService {
     void setEnabled(boolean enabled);
     boolean isEnabled();
-    void render(GraphicsContext gc, GameData gameData);
+    void render(GraphicsContext gc, GameData gameData, World world);
 }

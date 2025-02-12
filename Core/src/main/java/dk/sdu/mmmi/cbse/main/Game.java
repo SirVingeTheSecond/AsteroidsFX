@@ -6,6 +6,7 @@ import dk.sdu.mmmi.cbse.common.data.GameKeys;
 import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.services.*;
 import javafx.animation.AnimationTimer;
+import javafx.scene.canvas.*;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Polygon;
@@ -22,6 +23,7 @@ public class Game {
     private final World world = new World();
     private final Map<Entity, Polygon> polygons = new ConcurrentHashMap<>();
     private final Pane gameWindow = new Pane();
+    private final Canvas debugCanvas;
 
     private final List<IDebugService> debugServices;
     private final List<IGamePluginService> gamePluginServices;
@@ -43,11 +45,14 @@ public class Game {
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .collect(toList());
+
+        debugCanvas = new Canvas(gameData.getDisplayWidth(), gameData.getDisplayHeight());
+        gameWindow.getChildren().add(debugCanvas);
     }
 
     public void start(Stage window) {
         gameWindow.setPrefSize(gameData.getDisplayWidth(), gameData.getDisplayHeight());
-        gameWindow.setStyle("-fx-background-color: black;"); // Set background to black
+        gameWindow.setStyle("-fx-background-color: black;");
 
         Scene scene = new Scene(gameWindow);
         setupInput(scene);
@@ -86,8 +91,7 @@ public class Game {
                 case RIGHT -> gameData.getKeys().setKey(GameKeys.RIGHT, true);
                 case UP -> gameData.getKeys().setKey(GameKeys.UP, true);
                 case SPACE -> gameData.getKeys().setKey(GameKeys.SPACE, true);
-                case F3 -> debugServices.forEach(service ->
-                        service.setEnabled(!service.isEnabled()));
+                case F3 -> debugServices.forEach(service -> service.setEnabled(!service.isEnabled()));
             }
         });
 
@@ -128,28 +132,43 @@ public class Game {
     }
 
     private void draw() {
-        // Remove polygons for entities that no longer exist
-        polygons.keySet().removeIf(entity -> {
-            if (!world.getEntities().contains(entity)) {
-                gameWindow.getChildren().remove(polygons.get(entity));
-                return true;
-            }
-            return false;
-        });
+        // Remove previous entities
+        gameWindow.getChildren().removeIf(node -> node instanceof Polygon);
 
-        // Update or create polygons for current entities
+        // Update entity polygons
         for (Entity entity : world.getEntities()) {
             Polygon polygon = polygons.get(entity);
             if (polygon == null) {
                 polygon = createPolygonForEntity(entity);
                 polygons.put(entity, polygon);
-                gameWindow.getChildren().add(polygon);
             }
 
-            // Update polygon position and rotation
             polygon.setTranslateX(entity.getX());
             polygon.setTranslateY(entity.getY());
             polygon.setRotate(entity.getRotation());
+
+            if (!gameWindow.getChildren().contains(polygon)) {
+                gameWindow.getChildren().add(polygon);
+            }
+        }
+
+        // Handle debug rendering
+        if (!debugServices.isEmpty()) {
+            javafx.scene.canvas.Canvas debugCanvas = new javafx.scene.canvas.Canvas(
+                    gameData.getDisplayWidth(),
+                    gameData.getDisplayHeight()
+            );
+            javafx.scene.canvas.GraphicsContext gc = debugCanvas.getGraphicsContext2D();
+
+            // Render debug visualizations
+            for (IDebugService debugService : debugServices) {
+                debugService.render(gc, gameData, world);
+            }
+
+            // Add debug canvas on top
+            if (!gameWindow.getChildren().contains(debugCanvas)) {
+                gameWindow.getChildren().add(debugCanvas);
+            }
         }
     }
 }

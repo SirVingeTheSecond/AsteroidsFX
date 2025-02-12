@@ -8,16 +8,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class CollisionGridVisualizer implements IDebugService {
-    private static final int CELL_SIZE = 64; // Must match CollisionSystem's CELL_SIZE
+    private static final int CELL_SIZE = 64;
     private boolean enabled = false;
-    private final CollisionSystem collisionSystem;
-    private final World world;
-
-    public CollisionGridVisualizer() {
-        // Get references through ServiceLoader
-        this.collisionSystem = new CollisionSystem(); // We might want to get this through ServiceLoader too
-        this.world = new World();
-    }
 
     @Override
     public void setEnabled(boolean enabled) {
@@ -30,19 +22,16 @@ public class CollisionGridVisualizer implements IDebugService {
     }
 
     @Override
-    public void render(GraphicsContext gc, GameData gameData) {
+    public void render(GraphicsContext gc, GameData gameData, World world) {
         if (!enabled) return;
 
-        // Draw grid
-        drawGrid(gc, gameData);
-
-        // Draw entity collision circles
-        drawCollisionCircles(gc);
+        drawGrid(gc, gameData, world);
+        drawCollisionCircles(gc, world);
     }
 
-    private void drawGrid(GraphicsContext gc, GameData gameData) {
+    private void drawGrid(GraphicsContext gc, GameData gameData, World world) {
         // Draw grid lines
-        gc.setStroke(Color.LIGHTGRAY);
+        gc.setStroke(Color.YELLOW);
         gc.setLineWidth(0.5);
 
         // Vertical lines
@@ -56,7 +45,7 @@ public class CollisionGridVisualizer implements IDebugService {
         }
 
         // Highlight cells with entities
-        gc.setFill(Color.rgb(0, 255, 0, 0.1)); // Semi-transparent green
+        gc.setFill(Color.rgb(0, 255, 0, 0.15));
         for (Entity entity : world.getEntities()) {
             int cellX = (int) (entity.getX() / CELL_SIZE);
             int cellY = (int) (entity.getY() / CELL_SIZE);
@@ -69,9 +58,9 @@ public class CollisionGridVisualizer implements IDebugService {
         }
     }
 
-    private void drawCollisionCircles(GraphicsContext gc) {
+    private void drawCollisionCircles(GraphicsContext gc, World world) {
         gc.setStroke(Color.RED);
-        gc.setLineWidth(1);
+        gc.setLineWidth(1.5);
         for (Entity entity : world.getEntities()) {
             gc.strokeOval(
                     entity.getX() - entity.getRadius(),
