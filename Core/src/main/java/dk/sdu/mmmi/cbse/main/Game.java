@@ -47,6 +47,7 @@ public class Game {
                 .collect(toList());
 
         debugCanvas = new Canvas(gameData.getDisplayWidth(), gameData.getDisplayHeight());
+        debugCanvas.setMouseTransparent(true);
         gameWindow.getChildren().add(debugCanvas);
     }
 
@@ -152,22 +153,15 @@ public class Game {
             }
         }
 
-        // Handle debug rendering
-        if (!debugServices.isEmpty()) {
-            javafx.scene.canvas.Canvas debugCanvas = new javafx.scene.canvas.Canvas(
-                    gameData.getDisplayWidth(),
-                    gameData.getDisplayHeight()
-            );
-            javafx.scene.canvas.GraphicsContext gc = debugCanvas.getGraphicsContext2D();
+        // Clear debug canvas
+        javafx.scene.canvas.GraphicsContext gc = debugCanvas.getGraphicsContext2D();
+        gc.clearRect(0, 0, debugCanvas.getWidth(), debugCanvas.getHeight());
 
-            // Render debug visualizations
+        // Render debug visualizations if any service is enabled
+        boolean anyDebugEnabled = debugServices.stream().anyMatch(IDebugService::isEnabled);
+        if (anyDebugEnabled) {
             for (IDebugService debugService : debugServices) {
                 debugService.render(gc, gameData, world);
-            }
-
-            // Add debug canvas on top
-            if (!gameWindow.getChildren().contains(debugCanvas)) {
-                gameWindow.getChildren().add(debugCanvas);
             }
         }
     }
