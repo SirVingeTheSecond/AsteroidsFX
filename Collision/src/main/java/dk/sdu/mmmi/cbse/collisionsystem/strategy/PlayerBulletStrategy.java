@@ -7,11 +7,16 @@ import dk.sdu.mmmi.cbse.playersystem.Player;
 import dk.sdu.mmmi.cbse.common.services.IGameEventService;
 import dk.sdu.mmmi.cbse.common.events.EntityDestroyedEvent;
 
+import java.util.ServiceLoader;
+
 public class PlayerBulletStrategy implements ICollisionStrategy {
     private final IGameEventService eventService;
 
-    public PlayerBulletStrategy(IGameEventService eventService) {
-        this.eventService = eventService;
+    public PlayerBulletStrategy() {
+        // Required no-args constructor for ServiceLoader
+        this.eventService = ServiceLoader.load(IGameEventService.class)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No IGameEventService implementation found"));
     }
 
     @Override
@@ -33,6 +38,7 @@ public class PlayerBulletStrategy implements ICollisionStrategy {
             bullet = (Bullet) entity1;
         }
 
+        // Only process collision if bullet wasn't fired by this player
         if (!bullet.getShooterID().equals(player.getID())) {
             eventService.publish(new EntityDestroyedEvent(player, "Player hit by bullet"));
             world.removeEntity(player);

@@ -7,11 +7,15 @@ import dk.sdu.mmmi.cbse.enemysystem.EnemyShip;
 import dk.sdu.mmmi.cbse.common.services.IGameEventService;
 import dk.sdu.mmmi.cbse.common.events.EntityDestroyedEvent;
 
+import java.util.ServiceLoader;
+
 public class EnemyBulletStrategy implements ICollisionStrategy {
     private final IGameEventService eventService;
 
-    public EnemyBulletStrategy(IGameEventService eventService) {
-        this.eventService = eventService;
+    public EnemyBulletStrategy() {
+        this.eventService = ServiceLoader.load(IGameEventService.class)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No IGameEventService implementation found"));
     }
 
     @Override

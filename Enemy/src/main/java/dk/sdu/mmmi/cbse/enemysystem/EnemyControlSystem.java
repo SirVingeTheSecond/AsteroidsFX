@@ -33,7 +33,7 @@ public class EnemyControlSystem implements IEntityProcessingService {
             }
 
             // Regular movement pattern
-            if (enemyShip.getMoveTimer() <= 0) {
+            if (enemyShip.getTimerComponent().getMoveTimer() <= 0) {
                 updateMovementDirection(enemyShip);
             }
 
@@ -41,9 +41,9 @@ public class EnemyControlSystem implements IEntityProcessingService {
             moveEnemyShip(enemyShip, gameData);
 
             // Only shoot if not near edges and timer is up
-            if (enemyShip.getShootTimer() <= 0 && !isNearEdge(enemyShip, gameData)) {
+            if (enemyShip.getTimerComponent().getShootTimer() <= 0 && !isNearEdge(enemyShip, gameData)) {
                 shootBullet(enemyShip, gameData, world);
-                enemyShip.setShootTimer(SHOOTING_INTERVAL + random.nextInt(60));
+                enemyShip.getTimerComponent().setShootTimer(SHOOTING_INTERVAL + random.nextInt(60));
             }
         }
     }
@@ -71,12 +71,13 @@ public class EnemyControlSystem implements IEntityProcessingService {
         angleToCenter = angleToCenter % 360;
 
         enemy.setRotation(angleToCenter);
-        enemy.setMoveTimer(MOVEMENT_UPDATE_INTERVAL);
+        enemy.getTimerComponent().setMoveTimer(MOVEMENT_UPDATE_INTERVAL);
     }
 
     private void updateTimers(EnemyShip enemyShip) {
-        enemyShip.setMoveTimer(enemyShip.getMoveTimer() - 1);
-        enemyShip.setShootTimer(enemyShip.getShootTimer() - 1);
+        var timerComponent = enemyShip.getTimerComponent();
+        timerComponent.setMoveTimer(timerComponent.getMoveTimer() - 1);
+        timerComponent.setShootTimer(timerComponent.getShootTimer() - 1);
     }
 
     private void updateMovementDirection(EnemyShip enemyShip) {
@@ -85,7 +86,7 @@ public class EnemyControlSystem implements IEntityProcessingService {
         double newRotation = (currentRotation + rotationChange + 360) % 360;
 
         enemyShip.setRotation(newRotation);
-        enemyShip.setMoveTimer(MOVEMENT_UPDATE_INTERVAL + random.nextInt(60));
+        enemyShip.getTimerComponent().setMoveTimer(MOVEMENT_UPDATE_INTERVAL + random.nextInt(60));
     }
 
     private void moveEnemyShip(EnemyShip enemyShip, GameData gameData) {

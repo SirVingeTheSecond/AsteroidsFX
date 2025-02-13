@@ -1,7 +1,7 @@
 package dk.sdu.mmmi.cbse.collisionsystem;
 
 import dk.sdu.mmmi.cbse.collisionsystem.collision.CollisionDetector;
-import dk.sdu.mmmi.cbse.collisionsystem.strategy.*;
+import dk.sdu.mmmi.cbse.collisionsystem.strategy.ICollisionStrategy;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
@@ -10,7 +10,6 @@ import dk.sdu.mmmi.cbse.common.services.IGameEventService;
 import dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService;
 
 import java.util.*;
-import java.util.ServiceLoader;
 
 public class CollisionSystem implements IPostEntityProcessingService {
     private final CollisionDetector detector;
@@ -19,44 +18,41 @@ public class CollisionSystem implements IPostEntityProcessingService {
 
     public CollisionSystem() {
         this.detector = new CollisionDetector();
-        this.strategies = new ArrayList<>();
 
         // Load required services
         ServiceLoader<IGameEventService> eventLoader = ServiceLoader.load(IGameEventService.class);
         this.eventService = eventLoader.findFirst()
                 .orElseThrow(() -> new RuntimeException("No IGameEventService implementation found"));
 
-        // Initialize strategies
-        initializeStrategies();
-    }
+        // Load collision strategies
+        this.strategies = new ArrayList<>();
+        ServiceLoader<ICollisionStrategy> strategyLoader = ServiceLoader.load(ICollisionStrategy.class);
+        strategyLoader.forEach(strategy -> {
+            strategies.add(strategy);
+            System.out.println("Loaded collision strategy: " + strategy.getClass().getName());
+        });
 
-    private void initializeStrategies() {
-        strategies.add(new PlayerBulletStrategy(eventService));
-        strategies.add(new PlayerAsteroidStrategy(eventService));
-        strategies.add(new PlayerEnemyStrategy(eventService));
-        strategies.add(new EnemyBulletStrategy(eventService));
-        strategies.add(new EnemyAsteroidStrategy(eventService));
-
-        // Only try to create AsteroidBulletStrategy if we need it
-        try {
-            strategies.add(new AsteroidBulletStrategy(eventService));
-        } catch (RuntimeException e) {
-            // Log warning but continue - asteroid splitting won't work but game can continue
-            System.out.println("Warning: AsteroidBulletStrategy could not be initialized: " + e.getMessage());
+        if (strategies.isEmpty()) {
+            System.out.println("No collision strategies were loaded!");
         }
     }
 
     @Override
     public void process(GameData gameData, World world) {
+        // Skip processing if no strategies are available
+        if (strategies.isEmpty()) {
+            return;
+        }
+
         // Clear the spatial partitioning grid
         detector.clear();
 
-        // Populate grid
+        // Populate grid with current entities
         for (Entity entity : world.getEntities()) {
             detector.addToGrid(entity);
         }
 
-        // Check collisions
+        // Check for collisions
         Set<CollisionPair> processedPairs = new HashSet<>();
 
         for (Entity entity : world.getEntities()) {
@@ -80,10 +76,14 @@ public class CollisionSystem implements IPostEntityProcessingService {
 
     private void handleCollision(Entity entity1, Entity entity2, World world) {
         for (ICollisionStrategy strategy : strategies) {
-            if (strategy.canHandle(entity1, entity2)) {
-                if (strategy.handleCollision(entity1, entity2, world)) {
-                    break;  // Collision handled, stop processing
+            try {
+                if (strategy.canHandle(entity1, entity2)) {
+                    if (strategy.handleCollision(entity1, entity2, world)) {
+                        return;  // Collision handled, stop processing
+                    }
                 }
+            } catch (Exception e) {
+                System.out.println("Error in collision strategy: " + strategy.getClass().getName());
             }
         }
     }

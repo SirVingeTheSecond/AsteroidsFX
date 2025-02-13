@@ -26,50 +26,54 @@ public class Game {
     private final Canvas debugCanvas;
 
     private final List<IDebugService> debugServices;
-    private final List<IGamePluginService> gamePluginServices;
-    private final List<IEntityProcessingService> entityProcessingServiceList;
-    private final List<IPostEntityProcessingService> postEntityProcessingServices;
+    private final List<IPluginLifecycle> pluginLifecycles;
+    private final List<IEntityProcessingService> entityProcessors;
+    private final List<IPostEntityProcessingService> postProcessors;
     private final IGameEventService eventService;
 
-    Game(List<IGamePluginService> gamePluginServices,
-         List<IEntityProcessingService> entityProcessingServiceList,
-         List<IPostEntityProcessingService> postEntityProcessingServices,
+    Game(List<IPluginLifecycle> pluginLifecycles,
+         List<IEntityProcessingService> entityProcessors,
+         List<IPostEntityProcessingService> postProcessors,
          IGameEventService eventService) {
-        this.gamePluginServices = gamePluginServices;
-        this.entityProcessingServiceList = entityProcessingServiceList;
-        this.postEntityProcessingServices = postEntityProcessingServices;
+
+        this.pluginLifecycles = pluginLifecycles;
+        this.entityProcessors = entityProcessors;
+        this.postProcessors = postProcessors;
         this.eventService = eventService;
 
-        // Load debug services
+        // Load debug services dynamically
         this.debugServices = ServiceLoader.load(IDebugService.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .collect(toList());
 
+        // Initialize debug canvas
         debugCanvas = new Canvas(gameData.getDisplayWidth(), gameData.getDisplayHeight());
         debugCanvas.setMouseTransparent(true);
         gameWindow.getChildren().add(debugCanvas);
     }
 
     public void start(Stage window) {
+        // Setup game window
         gameWindow.setPrefSize(gameData.getDisplayWidth(), gameData.getDisplayHeight());
         gameWindow.setStyle("-fx-background-color: black;");
 
         Scene scene = new Scene(gameWindow);
         setupInput(scene);
 
-        // Initialize all game plugins and add entities
-        for (IGamePluginService iGamePlugin : gamePluginServices) {
-            iGamePlugin.start(gameData, world);
+        // Start all plugins
+        for (IPluginLifecycle plugin : pluginLifecycles) {
+            plugin.start(gameData, world);
         }
 
-        // Create polygons for initial entities
+        // Create initial entity polygons
         for (Entity entity : world.getEntities()) {
             Polygon polygon = createPolygonForEntity(entity);
             polygons.put(entity, polygon);
             gameWindow.getChildren().add(polygon);
         }
 
+        // Setup window
         window.setScene(scene);
         window.setTitle("Asteroids");
         window.show();
@@ -92,7 +96,8 @@ public class Game {
                 case RIGHT -> gameData.getKeys().setKey(GameKeys.RIGHT, true);
                 case UP -> gameData.getKeys().setKey(GameKeys.UP, true);
                 case SPACE -> gameData.getKeys().setKey(GameKeys.SPACE, true);
-                case F3 -> debugServices.forEach(service -> service.setEnabled(!service.isEnabled()));
+                case F3 -> debugServices.forEach(service ->
+                        service.setEnabled(!service.isEnabled()));
             }
         });
 
@@ -119,21 +124,21 @@ public class Game {
 
     private void update() {
         // Process all entities
-        for (IEntityProcessingService entityProcessorService : entityProcessingServiceList) {
-            entityProcessorService.process(gameData, world);
+        for (IEntityProcessingService processor : entityProcessors) {
+            processor.process(gameData, world);
         }
 
-        // Process any pending events
+        // Process events
         eventService.process();
 
         // Run post-processing
-        for (IPostEntityProcessingService postEntityProcessorService : postEntityProcessingServices) {
-            postEntityProcessorService.process(gameData, world);
+        for (IPostEntityProcessingService postProcessor : postProcessors) {
+            postProcessor.process(gameData, world);
         }
     }
 
     private void draw() {
-        // Remove previous entities
+        // Remove old polygons
         gameWindow.getChildren().removeIf(node -> node instanceof Polygon);
 
         // Update entity polygons
@@ -144,6 +149,7 @@ public class Game {
                 polygons.put(entity, polygon);
             }
 
+            // Update polygon position and rotation
             polygon.setTranslateX(entity.getX());
             polygon.setTranslateY(entity.getY());
             polygon.setRotate(entity.getRotation());
@@ -153,16 +159,24 @@ public class Game {
             }
         }
 
-        // Clear debug canvas
-        javafx.scene.canvas.GraphicsContext gc = debugCanvas.getGraphicsContext2D();
+        // Clear and update debug canvas
+        GraphicsContext gc = debugCanvas.getGraphicsContext2D();
         gc.clearRect(0, 0, debugCanvas.getWidth(), debugCanvas.getHeight());
 
-        // Render debug visualizations if any service is enabled
-        boolean anyDebugEnabled = debugServices.stream().anyMatch(IDebugService::isEnabled);
+        // Render debug visualizations if enabled
+        boolean anyDebugEnabled = debugServices.stream()
+                .anyMatch(IDebugService::isEnabled);
+
         if (anyDebugEnabled) {
-            for (IDebugService debugService : debugServices) {
-                debugService.render(gc, gameData, world);
-            }
+            debugServices.forEach(service ->
+                    service.render(gc, gameData, world));
+        }
+    }
+
+    public void stop() {
+        // Stop all plugins
+        for (IPluginLifecycle plugin : pluginLifecycles) {
+            plugin.stop(gameData, world);
         }
     }
 }

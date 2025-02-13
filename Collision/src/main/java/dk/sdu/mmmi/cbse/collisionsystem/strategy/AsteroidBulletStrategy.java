@@ -7,11 +7,15 @@ import dk.sdu.mmmi.cbse.common.bullet.Bullet;
 import dk.sdu.mmmi.cbse.common.services.IGameEventService;
 import dk.sdu.mmmi.cbse.common.events.EntityDestroyedEvent;
 
+import java.util.ServiceLoader;
+
 public class AsteroidBulletStrategy implements ICollisionStrategy {
     private final IGameEventService eventService;
 
-    public AsteroidBulletStrategy(IGameEventService eventService) {
-        this.eventService = eventService;
+    public AsteroidBulletStrategy() {
+        this.eventService = ServiceLoader.load(IGameEventService.class)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No IGameEventService implementation found"));
     }
 
     @Override

@@ -5,21 +5,39 @@ import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 
-public class EnemyPlugin implements IGamePluginService {
+import dk.sdu.mmmi.cbse.common.data.Entity;
+import dk.sdu.mmmi.cbse.common.data.GameData;
+import dk.sdu.mmmi.cbse.common.data.World;
+import dk.sdu.mmmi.cbse.common.services.IPluginLifecycle;
+import dk.sdu.mmmi.cbse.common.services.IEntityFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class EnemyPlugin implements IPluginLifecycle, IEntityFactory<EnemyShip> {
     private static final int ENEMIES_TO_SPAWN = 3;
-    private Entity enemy;
+    private final List<Entity> enemies = new ArrayList<>();
 
     @Override
     public void start(GameData gameData, World world) {
-        for (int i = 0; i < ENEMIES_TO_SPAWN; i++)
-        {
-            enemy = createEnemyShip(gameData);
+        for (int i = 0; i < ENEMIES_TO_SPAWN; i++) {
+            Entity enemy = createEntity(gameData);
+            enemies.add(enemy);
             world.addEntity(enemy);
         }
     }
 
-    private Entity createEnemyShip(GameData gameData) {
-        Entity enemyShip = new EnemyShip();
+    @Override
+    public void stop(GameData gameData, World world) {
+        for (Entity enemy : enemies) {
+            world.removeEntity(enemy);
+        }
+        enemies.clear();
+    }
+
+    @Override
+    public EnemyShip createEntity(GameData gameData) {
+        EnemyShip enemyShip = new EnemyShip();
 
         // Triangle shape pointing left
         enemyShip.setPolygonCoordinates(5,-5, -10,0, 5,5);
@@ -28,11 +46,7 @@ public class EnemyPlugin implements IGamePluginService {
         enemyShip.setX(Math.random() * gameData.getDisplayWidth());
         enemyShip.setY(Math.random() * gameData.getDisplayHeight());
         enemyShip.setRadius(8);
-        return enemyShip;
-    }
 
-    @Override
-    public void stop(GameData gameData, World world) {
-        world.removeEntity(enemy);
+        return enemyShip;
     }
 }
