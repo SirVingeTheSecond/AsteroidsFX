@@ -5,6 +5,7 @@ module Collision {
     requires Enemy;
     requires CommonBullet;
     requires javafx.graphics;
+    requires CommonCollision;
 
     uses dk.sdu.mmmi.cbse.common.services.IGameEventService;
     uses dk.sdu.mmmi.cbse.common.asteroids.IAsteroidSplitter;

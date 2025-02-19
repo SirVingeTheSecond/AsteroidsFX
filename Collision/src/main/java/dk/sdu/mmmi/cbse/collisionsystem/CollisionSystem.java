@@ -1,7 +1,8 @@
 package dk.sdu.mmmi.cbse.collisionsystem;
 
 import dk.sdu.mmmi.cbse.collisionsystem.collision.CollisionDetector;
-import dk.sdu.mmmi.cbse.collisionsystem.strategy.ICollisionStrategy;
+import dk.sdu.mmmi.cbse.common.collision.CollisionComponent;
+import dk.sdu.mmmi.cbse.common.collision.CollisionResponseComponent;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
@@ -13,7 +14,6 @@ import java.util.*;
 
 public class CollisionSystem implements IPostEntityProcessingService {
     private final CollisionDetector detector;
-    private final List<ICollisionStrategy> strategies;
     private final IGameEventService eventService;
 
     public CollisionSystem() {
@@ -23,39 +23,27 @@ public class CollisionSystem implements IPostEntityProcessingService {
         ServiceLoader<IGameEventService> eventLoader = ServiceLoader.load(IGameEventService.class);
         this.eventService = eventLoader.findFirst()
                 .orElseThrow(() -> new RuntimeException("No IGameEventService implementation found"));
-
-        // Load collision strategies
-        this.strategies = new ArrayList<>();
-        ServiceLoader<ICollisionStrategy> strategyLoader = ServiceLoader.load(ICollisionStrategy.class);
-        strategyLoader.forEach(strategy -> {
-            strategies.add(strategy);
-            System.out.println("Loaded collision strategy: " + strategy.getClass().getName());
-        });
-
-        if (strategies.isEmpty()) {
-            System.out.println("No collision strategies were loaded!");
-        }
     }
 
     @Override
     public void process(GameData gameData, World world) {
-        // Skip processing if no strategies are available
-        if (strategies.isEmpty()) {
-            return;
-        }
-
         // Clear the spatial partitioning grid
         detector.clear();
 
-        // Populate grid with current entities
+        // Get all entities with collision components
+        List<Entity> collidableEntities = new ArrayList<>();
         for (Entity entity : world.getEntities()) {
-            detector.addToGrid(entity);
+            CollisionComponent cc = entity.getComponent(CollisionComponent.class);
+            if (cc != null && cc.isActive()) {
+                collidableEntities.add(entity);
+                detector.addToGrid(entity);
+            }
         }
 
         // Check for collisions
         Set<CollisionPair> processedPairs = new HashSet<>();
 
-        for (Entity entity : world.getEntities()) {
+        for (Entity entity : collidableEntities) {
             Set<Entity> potentialCollisions = detector.getPotentialCollisions(entity);
 
             for (Entity other : potentialCollisions) {
@@ -75,16 +63,18 @@ public class CollisionSystem implements IPostEntityProcessingService {
     }
 
     private void handleCollision(Entity entity1, Entity entity2, World world) {
-        for (ICollisionStrategy strategy : strategies) {
-            try {
-                if (strategy.canHandle(entity1, entity2)) {
-                    if (strategy.handleCollision(entity1, entity2, world)) {
-                        return;  // Collision handled, stop processing
-                    }
-                }
-            } catch (Exception e) {
-                System.out.println("Error in collision strategy: " + strategy.getClass().getName());
+        CollisionResponseComponent response1 = entity1.getComponent(CollisionResponseComponent.class);
+        CollisionResponseComponent response2 = entity2.getComponent(CollisionResponseComponent.class);
+
+        // Handle responses in order if present
+        if (response1 != null) {
+            if (response1.handleCollision(entity1, entity2, world)) {
+                return;
             }
+        }
+
+        if (response2 != null) {
+            response2.handleCollision(entity2, entity1, world);
         }
     }
 

@@ -19,9 +19,4 @@ public class TimerComponent {
     public void setShootTimer(float timer) {
         this.shootTimer = timer;
     }
-
-    public void update() {
-        moveTimer--;
-        shootTimer--;
-    }
 }
