@@ -1,6 +1,8 @@
 package dk.sdu.mmmi.cbse.enemysystem;
 
-public class TimerComponent {
+import dk.sdu.mmmi.cbse.common.data.Component;
+
+public class TimerComponent implements Component {
     private float moveTimer;
     private float shootTimer;
 

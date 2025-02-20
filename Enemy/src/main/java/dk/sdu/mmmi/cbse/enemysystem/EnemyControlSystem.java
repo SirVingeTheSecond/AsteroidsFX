@@ -3,7 +3,10 @@ package dk.sdu.mmmi.cbse.enemysystem;
 import dk.sdu.mmmi.cbse.common.bullet.BulletSPI;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
+import dk.sdu.mmmi.cbse.common.data.MovementComponent;
 import dk.sdu.mmmi.cbse.common.data.World;
+import dk.sdu.mmmi.cbse.common.enemy.EnemyBehavior;
+import dk.sdu.mmmi.cbse.common.enemy.IEnemyShip;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 
 import java.util.Collection;
@@ -13,104 +16,169 @@ import static java.util.stream.Collectors.toList;
 
 public class EnemyControlSystem implements IEntityProcessingService {
     private final Random random = new Random();
-    private static final float ENEMY_SPEED = 1.2f;
-    private static final int MOVEMENT_UPDATE_INTERVAL = 180;
-    private static final int SHOOTING_INTERVAL = 180;
-    private static final float MAX_ROTATION_CHANGE = 45.0f;
-    private static final float EDGE_MARGIN = 50.0f; // Distance from edge to start turning - prevents the enemy from getting stuck
+    private static final float EDGE_MARGIN = 50.0f;
 
     @Override
     public void process(GameData gameData, World world) {
-        var enemies = world.getEntities(EnemyShip.class);
+        // Get player position for targeting
+        Entity player = findPlayer(world);
 
-        for (Entity enemy : enemies) {
-            EnemyShip enemyShip = (EnemyShip) enemy;
-            updateTimers(enemyShip);
+        for (Entity entity : world.getEntities(EnemyShip.class)) {
+            IEnemyShip enemy = (IEnemyShip) entity;
+            MovementComponent movement = entity.getComponent(MovementComponent.class);
 
-            // Check if near edges and update direction if needed
-            if (isNearEdge(enemyShip, gameData)) {
-                updateDirectionAwayFromEdge(enemyShip, gameData);
+            if (movement == null) continue;
+
+            // Process behavior
+            switch (enemy.getBehavior()) {
+                case PATROL:
+                    processPatrolBehavior(entity, movement, gameData);
+                    break;
+                case AGGRESSIVE:
+                    if (player != null) {
+                        processAggressiveBehavior(entity, movement, player, enemy.getProperties().getDetectionRange());
+                    }
+                    break;
+                case DEFENSIVE:
+                    if (player != null) {
+                        processDefensiveBehavior(entity, movement, player, enemy.getProperties());
+                    }
+                    break;
+                case SNIPER:
+                    if (player != null) {
+                        processSniperBehavior(entity, movement, player, enemy.getProperties(), world);
+                    }
+                    break;
             }
 
-            // Regular movement pattern
-            if (enemyShip.getTimerComponent().getMoveTimer() <= 0) {
-                updateMovementDirection(enemyShip);
+            // Check for shooting
+            if (shouldShoot(entity, player, enemy)) {
+                shoot(entity, gameData, world);
             }
 
-            // Move the enemy ship
-            moveEnemyShip(enemyShip, gameData);
-
-            // Only shoot if not near edges and timer is up
-            if (enemyShip.getTimerComponent().getShootTimer() <= 0 && !isNearEdge(enemyShip, gameData)) {
-                shootBullet(enemyShip, gameData, world);
-                enemyShip.getTimerComponent().setShootTimer(SHOOTING_INTERVAL + random.nextInt(60));
-            }
+            // Handle screen wrapping
+            handleScreenWrap(entity, gameData);
         }
     }
 
-    private boolean isNearEdge(EnemyShip enemy, GameData gameData) {
-        return enemy.getX() < EDGE_MARGIN ||
-                enemy.getX() > gameData.getDisplayWidth() - EDGE_MARGIN ||
-                enemy.getY() < EDGE_MARGIN ||
-                enemy.getY() > gameData.getDisplayHeight() - EDGE_MARGIN;
+    private Entity findPlayer(World world) {
+        // Find first player entity - could be enhanced to handle multiple players
+        return world.getEntities().stream()
+                .filter(e -> e.getClass().getSimpleName().equals("Player"))
+                .findFirst()
+                .orElse(null);
     }
 
-    private void updateDirectionAwayFromEdge(EnemyShip enemy, GameData gameData) {
-        double centerX = gameData.getDisplayWidth() / 2.0;
-        double centerY = gameData.getDisplayHeight() / 2.0;
+    private void processPatrolBehavior(Entity entity, MovementComponent movement, GameData gameData) {
+        // Patrol follows a simple pattern and changes direction near edges
+        if (isNearEdge(entity, gameData)) {
+            // Turn to avoid edge
+            double currentRotation = entity.getRotation();
+            currentRotation += 90 + random.nextInt(90); // Turn 90-180 degrees
+            entity.setRotation(currentRotation % 360);
+        }
 
-        // Calculate angle towards center
-        double dx = centerX - enemy.getX();
-        double dy = centerY - enemy.getY();
-
-        double angleToCenter = Math.toDegrees(Math.atan2(dy, dx));
-
-        angleToCenter += (random.nextDouble() - 0.5) * 60;
-
-        // Ensure that we are between 0 and 360 degrees
-        angleToCenter = angleToCenter % 360;
-
-        enemy.setRotation(angleToCenter);
-        enemy.getTimerComponent().setMoveTimer(MOVEMENT_UPDATE_INTERVAL);
+        // Move in current direction
+        movement.setPattern(MovementComponent.MovementPattern.LINEAR);
     }
 
-    private void updateTimers(EnemyShip enemyShip) {
-        var timerComponent = enemyShip.getTimerComponent();
-        timerComponent.setMoveTimer(timerComponent.getMoveTimer() - 1);
-        timerComponent.setShootTimer(timerComponent.getShootTimer() - 1);
+    private void processAggressiveBehavior(Entity entity, MovementComponent movement, Entity player, float detectionRange) {
+        if (isInRange(entity, player, detectionRange)) {
+            // Direct pursuit of player
+            double angle = calculateAngleToTarget(entity, player);
+            entity.setRotation(angle);
+            movement.setPattern(MovementComponent.MovementPattern.LINEAR);
+        } else {
+            // Search pattern when player out of range
+            movement.setPattern(MovementComponent.MovementPattern.RANDOM);
+        }
     }
 
-    private void updateMovementDirection(EnemyShip enemyShip) {
-        double currentRotation = enemyShip.getRotation();
-        double rotationChange = (random.nextDouble() * 2 - 1) * MAX_ROTATION_CHANGE;
-        double newRotation = (currentRotation + rotationChange + 360) % 360;
+    private void processDefensiveBehavior(Entity entity, MovementComponent movement, Entity player,
+                                          dk.sdu.mmmi.cbse.common.enemy.EnemyProperties properties) {
+        float optimalRange = properties.getShootingRange() * 0.7f; // Stay at 70% of max range
+        float currentRange = calculateDistance(entity, player);
 
-        enemyShip.setRotation(newRotation);
-        enemyShip.getTimerComponent().setMoveTimer(MOVEMENT_UPDATE_INTERVAL + random.nextInt(60));
+        if (currentRange < optimalRange * 0.8f) { // Too close
+            // Move away from player
+            double angle = calculateAngleToTarget(entity, player);
+            entity.setRotation((angle + 180) % 360); // Opposite direction
+            movement.setPattern(MovementComponent.MovementPattern.LINEAR);
+        } else if (currentRange > optimalRange * 1.2f) { // Too far
+            // Move closer to player
+            double angle = calculateAngleToTarget(entity, player);
+            entity.setRotation(angle);
+            movement.setPattern(MovementComponent.MovementPattern.LINEAR);
+        } else {
+            // At good range, strafe
+            movement.setPattern(MovementComponent.MovementPattern.RANDOM);
+        }
     }
 
-    private void moveEnemyShip(EnemyShip enemyShip, GameData gameData) {
-        // Calculate movement based on current rotation
-        double radians = Math.toRadians(enemyShip.getRotation());
-        double deltaX = Math.cos(radians) * ENEMY_SPEED;
-        double deltaY = Math.sin(radians) * ENEMY_SPEED;
+    private void processSniperBehavior(Entity entity, MovementComponent movement, Entity player,
+                                       dk.sdu.mmmi.cbse.common.enemy.EnemyProperties properties, World world) {
+        float currentRange = calculateDistance(entity, player);
 
-        // Update position
-        double newX = enemyShip.getX() + deltaX;
-        double newY = enemyShip.getY() + deltaY;
-
-        // Constrain to screen with a small margin
-        newX = Math.max(5, Math.min(gameData.getDisplayWidth() - 5, newX));
-        newY = Math.max(5, Math.min(gameData.getDisplayHeight() - 5, newY));
-
-        enemyShip.setX(newX);
-        enemyShip.setY(newY);
+        if (currentRange <= properties.getShootingRange()
+                && hasLineOfSight(entity, player, world)) {
+            // Stop and aim at player
+            movement.setSpeed(0);
+            double angle = calculateAngleToTarget(entity, player);
+            entity.setRotation(angle);
+        } else {
+            // Reposition
+            movement.setSpeed(properties.getSpeed());
+            movement.setPattern(MovementComponent.MovementPattern.RANDOM);
+        }
     }
 
-    private void shootBullet(Entity enemy, GameData gameData, World world) {
+    private boolean shouldShoot(Entity entity, Entity player, IEnemyShip enemy) {
+        if (player == null) return false;
+
+        float range = calculateDistance(entity, player);
+        return range <= enemy.getProperties().getShootingRange()
+                && random.nextFloat() < 0.1; // 10% chance per frame if in range
+    }
+
+    private void shoot(Entity entity, GameData gameData, World world) {
         getBulletSPIs().stream().findFirst().ifPresent(
-                bulletSPI -> world.addEntity(bulletSPI.createBullet(enemy, gameData))
+                bulletSPI -> world.addEntity(bulletSPI.createBullet(entity, gameData))
         );
+    }
+
+    private boolean isNearEdge(Entity entity, GameData gameData) {
+        return entity.getX() < EDGE_MARGIN
+                || entity.getX() > gameData.getDisplayWidth() - EDGE_MARGIN
+                || entity.getY() < EDGE_MARGIN
+                || entity.getY() > gameData.getDisplayHeight() - EDGE_MARGIN;
+    }
+
+    private void handleScreenWrap(Entity entity, GameData gameData) {
+        if (entity.getX() < 0) entity.setX(gameData.getDisplayWidth());
+        if (entity.getX() > gameData.getDisplayWidth()) entity.setX(0);
+        if (entity.getY() < 0) entity.setY(gameData.getDisplayHeight());
+        if (entity.getY() > gameData.getDisplayHeight()) entity.setY(0);
+    }
+
+    private double calculateAngleToTarget(Entity source, Entity target) {
+        double dx = target.getX() - source.getX();
+        double dy = target.getY() - source.getY();
+        return Math.toDegrees(Math.atan2(dy, dx));
+    }
+
+    private float calculateDistance(Entity e1, Entity e2) {
+        double dx = e2.getX() - e1.getX();
+        double dy = e2.getY() - e1.getY();
+        return (float) Math.sqrt(dx * dx + dy * dy);
+    }
+
+    private boolean isInRange(Entity source, Entity target, float range) {
+        return calculateDistance(source, target) <= range;
+    }
+
+    private boolean hasLineOfSight(Entity source, Entity target, World world) {
+        // Simple line of sight check - could be enhanced with obstacle checking
+        return true;
     }
 
     private Collection<? extends BulletSPI> getBulletSPIs() {
