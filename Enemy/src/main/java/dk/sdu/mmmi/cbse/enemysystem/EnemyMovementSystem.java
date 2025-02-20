@@ -58,7 +58,7 @@ public class EnemyMovementSystem implements IEntityProcessingService {
     }
 
     private void updateAggressiveMovement(Entity entity, MovementComponent movement, Entity player) {
-        float distance = EnemyUtils.calculateDistance(entity, player);
+        double distance = EnemyUtils.calculateDistance(entity, player);
         if (distance > 0) {
             double angle = Math.toDegrees(Math.atan2(
                     player.getY() - entity.getY(),
@@ -70,7 +70,7 @@ public class EnemyMovementSystem implements IEntityProcessingService {
     }
 
     private void updateDefensiveMovement(Entity entity, MovementComponent movement, Entity player) {
-        float distance = EnemyUtils.calculateDistance(entity, player);
+        double distance = EnemyUtils.calculateDistance(entity, player);
         if (distance < 150) { // Keep distance
             double angle = Math.toDegrees(Math.atan2(
                     entity.getY() - player.getY(),

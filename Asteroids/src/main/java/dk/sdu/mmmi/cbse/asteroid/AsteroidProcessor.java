@@ -16,9 +16,8 @@ public class AsteroidProcessor implements IEntityProcessingService, IAsteroidSpl
 
     @Override
     public void process(GameData gameData, World world) {
-        // Asteroid-specific processing would go here
-        // Movement is handled by MovementSystem
-        // Splitting is triggered by collision system via IAsteroidSplitter
+        // Asteroid-specific processing could be added here
+        // Basic movement and collision are handled by their respective systems
     }
 
     @Override
@@ -28,15 +27,15 @@ public class AsteroidProcessor implements IEntityProcessingService, IAsteroidSpl
         }
 
         float newSize = asteroid.getRadius() * SPLIT_SIZE_RATIO;
+        MovementComponent oldMovement = asteroid.getComponent(MovementComponent.class);
 
         // Create two new smaller asteroids
         for (int i = 0; i < 2; i++) {
-            Entity newAsteroid = new Asteroid();
+            Asteroid newAsteroid = new Asteroid();
 
             // Set size and shape
             newAsteroid.setRadius(newSize);
-            double[] shape = generateAsteroidShape(newSize);
-            newAsteroid.setPolygonCoordinates(shape);
+            newAsteroid.setPolygonCoordinates(generateAsteroidShape(newSize));
 
             // Position slightly offset from original
             double angle = rnd.nextDouble() * 2 * Math.PI;
@@ -44,11 +43,19 @@ public class AsteroidProcessor implements IEntityProcessingService, IAsteroidSpl
             newAsteroid.setX(asteroid.getX() + Math.cos(angle) * offset);
             newAsteroid.setY(asteroid.getY() + Math.sin(angle) * offset);
 
-            // Setup movement
+            // Set split count
+            Asteroid oldAsteroid = (Asteroid) asteroid;
+            newAsteroid.setSplitCount(oldAsteroid.getSplitCount() + 1);
+
+            // Setup movement with some inherited momentum
             MovementComponent movement = new MovementComponent();
             movement.setPattern(MovementComponent.MovementPattern.RANDOM);
-            movement.setSpeed(0.5f + rnd.nextFloat()); // Random speed
-            movement.setRotationSpeed(-2 + rnd.nextFloat() * 4); // Random rotation -2 to 2
+            if (oldMovement != null) {
+                movement.setSpeed(oldMovement.getSpeed() * (0.8f + rnd.nextFloat() * 0.4f));
+            } else {
+                movement.setSpeed(1.0f + rnd.nextFloat());
+            }
+            movement.setRotationSpeed(-2 + rnd.nextFloat() * 4);
             newAsteroid.addComponent(movement);
 
             // Add to world
@@ -66,6 +73,7 @@ public class AsteroidProcessor implements IEntityProcessingService, IAsteroidSpl
 
         for (int i = 0; i < vertices; i++) {
             double angle = Math.toRadians(i * angleStep);
+            // Randomize radius slightly for more natural shape
             double radius = size * (0.8 + rnd.nextDouble() * 0.4);
             shape[i * 2] = Math.cos(angle) * radius;
             shape[i * 2 + 1] = Math.sin(angle) * radius;

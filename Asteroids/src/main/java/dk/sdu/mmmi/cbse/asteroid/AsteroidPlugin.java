@@ -5,13 +5,12 @@ import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.data.MovementComponent;
+import dk.sdu.mmmi.cbse.common.collision.CollisionComponent;
+import dk.sdu.mmmi.cbse.common.collision.CollisionLayer;
+import dk.sdu.mmmi.cbse.common.collision.CollisionGroup;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 import java.util.Random;
 
-/**
- * Plugin responsible for asteroid lifecycle management.
- * Single responsibility: Creates and removes asteroids with proper initialization.
- */
 public class AsteroidPlugin implements IGamePluginService {
     private static final int ASTEROIDS_TO_SPAWN = 4;
     private static final float MIN_SPEED = 0.5f;
@@ -23,15 +22,19 @@ public class AsteroidPlugin implements IGamePluginService {
 
     @Override
     public void start(GameData gameData, World world) {
+        System.out.println("AsteroidPlugin.start() called - spawning " + ASTEROIDS_TO_SPAWN + " asteroids");
+
         // Spawn initial asteroids
         for (int i = 0; i < ASTEROIDS_TO_SPAWN; i++) {
             Entity asteroid = createAsteroid(gameData);
             world.addEntity(asteroid);
+            System.out.println("Created asteroid at position: " + asteroid.getX() + "," + asteroid.getY());
         }
     }
 
     @Override
     public void stop(GameData gameData, World world) {
+        System.out.println("AsteroidPlugin.stop() called - removing all asteroids");
         // Remove all asteroids
         for (Entity asteroid : world.getEntities(Asteroid.class)) {
             world.removeEntity(asteroid);
@@ -39,7 +42,7 @@ public class AsteroidPlugin implements IGamePluginService {
     }
 
     private Entity createAsteroid(GameData gameData) {
-        Entity asteroid = new Asteroid();
+        Asteroid asteroid = new Asteroid();
 
         // Initialize movement component
         MovementComponent movement = new MovementComponent();
@@ -48,15 +51,25 @@ public class AsteroidPlugin implements IGamePluginService {
         movement.setRotationSpeed(MIN_ROTATION_SPEED + rnd.nextFloat() * (MAX_ROTATION_SPEED - MIN_ROTATION_SPEED));
         asteroid.addComponent(movement);
 
+        // Initialize collision component
+        CollisionComponent collision = new CollisionComponent();
+        collision.setLayer(CollisionLayer.OBSTACLE);
+        collision.addGroup(CollisionGroup.SOLID);
+        collision.addGroup(CollisionGroup.DESTRUCTIBLE);
+        asteroid.addComponent(collision);
+
         // Set basic entity properties
-        float size = rnd.nextInt(10) + 5;
+        float size = rnd.nextInt(10) + 20; // Made asteroids bigger for easier visibility
         asteroid.setRadius(size);
         asteroid.setPolygonCoordinates(generateAsteroidShape(size));
 
-        // Random starting position
-        asteroid.setX(rnd.nextDouble() * gameData.getDisplayWidth());
-        asteroid.setY(rnd.nextDouble() * gameData.getDisplayHeight());
+        // Random starting position (ensuring they're visible)
+        asteroid.setX(100 + rnd.nextDouble() * (gameData.getDisplayWidth() - 200));  // Keep away from edges
+        asteroid.setY(100 + rnd.nextDouble() * (gameData.getDisplayHeight() - 200)); // Keep away from edges
         asteroid.setRotation(rnd.nextInt(360));
+
+        // Initialize split count
+        asteroid.setSplitCount(0);
 
         return asteroid;
     }
@@ -68,7 +81,6 @@ public class AsteroidPlugin implements IGamePluginService {
 
         for (int i = 0; i < vertices; i++) {
             double angle = Math.toRadians(i * angleStep);
-            // Randomize radius slightly for more natural shape
             double radius = size * (0.8 + rnd.nextDouble() * 0.4);
             shape[i * 2] = Math.cos(angle) * radius;
             shape[i * 2 + 1] = Math.sin(angle) * radius;

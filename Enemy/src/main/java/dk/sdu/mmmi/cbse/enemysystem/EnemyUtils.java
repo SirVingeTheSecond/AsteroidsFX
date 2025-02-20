@@ -11,10 +11,10 @@ public class EnemyUtils {
                 .orElse(null);
     }
 
-    public static float calculateDistance(Entity e1, Entity e2) {
+    public static double calculateDistance(Entity e1, Entity e2) {
         double dx = e2.getX() - e1.getX();
         double dy = e2.getY() - e1.getY();
-        return (float) Math.sqrt(dx * dx + dy * dy);
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     public static boolean hasLineOfSight(Entity source, Entity target) {

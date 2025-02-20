@@ -23,9 +23,9 @@ public class EnemyBehaviorSystem implements IEntityProcessingService {
     private void updateBehavior(IEnemyShip enemy, Entity player, World world) {
         if (player == null) return;
 
-        float distanceToPlayer = EnemyUtils.calculateDistance((Entity)enemy, player);
-        float health = enemy.getProperties().getHealth();
-        float maxHealth = 100; // Default max health or get from properties
+        double distanceToPlayer = EnemyUtils.calculateDistance((Entity)enemy, player);
+        double health = enemy.getProperties().getHealth();
+        double maxHealth = enemy.getProperties().getMaxHealth();
 
         if (health < maxHealth * 0.3) {
             ((EnemyShip)enemy).setBehavior(EnemyBehavior.DEFENSIVE);

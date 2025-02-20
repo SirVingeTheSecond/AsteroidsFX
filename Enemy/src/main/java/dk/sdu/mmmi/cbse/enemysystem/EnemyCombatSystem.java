@@ -40,7 +40,7 @@ public class EnemyCombatSystem implements IEntityProcessingService {
     private boolean shouldShoot(Entity entity, Entity player, IEnemyShip enemy) {
         if (player == null) return false;
 
-        float range = EnemyUtils.calculateDistance(entity, player);
+        double range = EnemyUtils.calculateDistance(entity, player);
         return range <= enemy.getProperties().getShootingRange()
                 && EnemyUtils.hasLineOfSight(entity, player)
                 && random.nextFloat() < 0.1;
