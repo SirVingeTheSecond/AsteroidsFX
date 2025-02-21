@@ -1,4 +1,4 @@
-package dk.sdu.mmmi.cbse.common.data;
+package dk.sdu.mmmi.cbse.common.components;
 
 /**
  * Base interface for all entity components.

@@ -1,4 +1,4 @@
-package dk.sdu.mmmi.cbse.common.data;
+package dk.sdu.mmmi.cbse.common.components;
 
 /**
  * Generic movement component for any entity that needs movement behavior.

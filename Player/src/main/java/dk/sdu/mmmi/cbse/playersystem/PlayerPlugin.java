@@ -5,7 +5,7 @@ import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.services.IPluginLifecycle;
 import dk.sdu.mmmi.cbse.common.services.IEntityFactory;
-import dk.sdu.mmmi.cbse.common.data.MovementComponent;
+import dk.sdu.mmmi.cbse.common.components.MovementComponent;
 import dk.sdu.mmmi.cbse.common.collision.CollisionComponent;
 import dk.sdu.mmmi.cbse.common.collision.CollisionResponseComponent;
 import dk.sdu.mmmi.cbse.common.collision.CollisionLayer;

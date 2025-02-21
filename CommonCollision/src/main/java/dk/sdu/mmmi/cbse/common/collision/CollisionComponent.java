@@ -1,6 +1,6 @@
 package dk.sdu.mmmi.cbse.common.collision;
 
-import dk.sdu.mmmi.cbse.common.data.Component;
+import dk.sdu.mmmi.cbse.common.components.Component;
 
 /**
  * Component that defines collision properties for an entity

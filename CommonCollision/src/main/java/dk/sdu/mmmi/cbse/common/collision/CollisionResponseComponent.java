@@ -1,6 +1,6 @@
 package dk.sdu.mmmi.cbse.common.collision;
 
-import dk.sdu.mmmi.cbse.common.data.Component;
+import dk.sdu.mmmi.cbse.common.components.Component;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.World;
 

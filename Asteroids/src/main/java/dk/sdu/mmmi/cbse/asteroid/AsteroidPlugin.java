@@ -4,7 +4,7 @@ import dk.sdu.mmmi.cbse.common.asteroids.Asteroid;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
-import dk.sdu.mmmi.cbse.common.data.MovementComponent;
+import dk.sdu.mmmi.cbse.common.components.MovementComponent;
 import dk.sdu.mmmi.cbse.common.collision.CollisionComponent;
 import dk.sdu.mmmi.cbse.common.collision.CollisionLayer;
 import dk.sdu.mmmi.cbse.common.collision.CollisionGroup;

@@ -3,7 +3,7 @@ package dk.sdu.mmmi.cbse.movementsystem;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
-import dk.sdu.mmmi.cbse.common.data.MovementComponent;
+import dk.sdu.mmmi.cbse.common.components.MovementComponent;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 
 public class MovementProcessor implements IEntityProcessingService {

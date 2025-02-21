@@ -7,7 +7,7 @@ import dk.sdu.mmmi.cbse.common.enemy.IEnemyFactory;
 import dk.sdu.mmmi.cbse.common.enemy.EnemyBehavior;
 import dk.sdu.mmmi.cbse.common.enemy.EnemyProperties;
 import dk.sdu.mmmi.cbse.common.services.IPluginLifecycle;
-import dk.sdu.mmmi.cbse.common.data.MovementComponent;
+import dk.sdu.mmmi.cbse.common.components.MovementComponent;
 import dk.sdu.mmmi.cbse.common.collision.CollisionComponent;
 import dk.sdu.mmmi.cbse.common.collision.CollisionLayer;
 import dk.sdu.mmmi.cbse.common.collision.CollisionGroup;
