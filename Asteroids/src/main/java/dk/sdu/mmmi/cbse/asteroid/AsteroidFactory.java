@@ -41,7 +41,7 @@ public class AsteroidFactory implements IEntityFactory<Entity> {
 
         // Create transform component
         TransformComponent transform = new TransformComponent();
-        float size = random.nextInt(10) + 20; // Made asteroids bigger for easier visibility
+        float size = random.nextInt(10) + 20;
 
         // If this is a split asteroid, adjust size based on parent
         if (parent != null && parent.hasComponent(TransformComponent.class) &&
@@ -58,7 +58,7 @@ public class AsteroidFactory implements IEntityFactory<Entity> {
             transform.setX(parentTransform.getX() + Math.cos(angle) * offset);
             transform.setY(parentTransform.getY() + Math.sin(angle) * offset);
         } else {
-            // Random starting position (ensuring they're visible)
+            // Random starting position (currently spawning at visible positions)
             transform.setX(100 + random.nextDouble() * (gameData.getDisplayWidth() - 200));  // Keep away from edges
             transform.setY(100 + random.nextDouble() * (gameData.getDisplayHeight() - 200)); // Keep away from edges
         }
@@ -70,9 +70,10 @@ public class AsteroidFactory implements IEntityFactory<Entity> {
 
         // Create movement component
         MovementComponent movement = new MovementComponent();
-        movement.setPattern(MovementComponent.MovementPattern.RANDOM);
+        movement.setPattern(MovementComponent.MovementPattern.LINEAR);
         movement.setSpeed(MIN_SPEED + random.nextFloat() * (MAX_SPEED - MIN_SPEED));
         movement.setRotationSpeed(MIN_ROTATION_SPEED + random.nextFloat() * (MAX_ROTATION_SPEED - MIN_ROTATION_SPEED));
+        //movement.setRotationSpeed((random.nextFloat() * 2 - 1) * MAX_ROTATION_SPEED * 0.5f);
 
         // If this is a split asteroid with a parent, inherit some of parent's momentum
         if (parent != null && parent.hasComponent(MovementComponent.class)) {

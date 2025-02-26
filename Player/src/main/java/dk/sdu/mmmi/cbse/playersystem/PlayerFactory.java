@@ -47,7 +47,7 @@ public class PlayerFactory implements IEntityFactory<Entity> {
         MovementComponent movement = new MovementComponent();
         movement.setPattern(MovementComponent.MovementPattern.PLAYER);
         movement.setSpeed(2.0f);
-        movement.setRotationSpeed(3.0f);
+        movement.setRotationSpeed(0.0f);
         player.addComponent(movement);
 
         // Add shooting component

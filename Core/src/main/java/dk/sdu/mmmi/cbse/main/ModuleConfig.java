@@ -25,19 +25,33 @@ class ModuleConfig {
     }
 
     @Bean
-    public List<IEntityProcessingService> entityProcessors() {
-        return ServiceLoader.load(IEntityProcessingService.class)
+    public List<IPluginLifecycle> pluginLifecycles() {
+        List<IPluginLifecycle> plugins = ServiceLoader.load(IPluginLifecycle.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .collect(toList());
+
+        System.out.println("Loaded " + plugins.size() + " plugins:");
+        for (IPluginLifecycle plugin : plugins) {
+            System.out.println(" - " + plugin.getClass().getName());
+        }
+
+        return plugins;
     }
 
     @Bean
-    public List<IPluginLifecycle> pluginLifecycles() {
-        return ServiceLoader.load(IPluginLifecycle.class)
+    public List<IEntityProcessingService> entityProcessors() {
+        List<IEntityProcessingService> processors = ServiceLoader.load(IEntityProcessingService.class)
                 .stream()
                 .map(ServiceLoader.Provider::get)
                 .collect(toList());
+
+        System.out.println("Loaded " + processors.size() + " entity processors:");
+        for (IEntityProcessingService processor : processors) {
+            System.out.println(" - " + processor.getClass().getName());
+        }
+
+        return processors;
     }
 
     @Bean

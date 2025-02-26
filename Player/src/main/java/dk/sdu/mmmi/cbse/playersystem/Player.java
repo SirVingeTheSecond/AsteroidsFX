@@ -8,6 +8,6 @@ import dk.sdu.mmmi.cbse.common.data.Entity;
  */
 @Deprecated
 public class Player extends Entity {
-    // This class is kept for backward compatibility only.
+    // This class is kept for backward compatibility only, will probably never use it though.
     // New code should use PlayerFactory and standard entity instances with components.
 }

@@ -3,7 +3,6 @@ import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 
 module Bullet {
-    requires java.desktop;
     requires Player;
     requires CommonBullet;
     requires CommonCollision;

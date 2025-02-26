@@ -232,10 +232,19 @@ public class EnemyControlSystem implements IEntityProcessingService {
     }
 
     private void handleScreenWrap(TransformComponent transform, GameData gameData) {
-        if (transform.getX() < 0) transform.setX(gameData.getDisplayWidth());
-        if (transform.getX() > gameData.getDisplayWidth()) transform.setX(0);
-        if (transform.getY() < 0) transform.setY(gameData.getDisplayHeight());
-        if (transform.getY() > gameData.getDisplayHeight()) transform.setY(0);
+        float buffer = 5.0f;
+
+        if (transform.getX() < -buffer) {
+            transform.setX(gameData.getDisplayWidth() + buffer);
+        } else if (transform.getX() > gameData.getDisplayWidth() + buffer) {
+            transform.setX(-buffer);
+        }
+
+        if (transform.getY() < -buffer) {
+            transform.setY(gameData.getDisplayHeight() + buffer);
+        } else if (transform.getY() > gameData.getDisplayHeight() + buffer) {
+            transform.setY(-buffer);
+        }
     }
 
     private double calculateAngleToTarget(TransformComponent source, TransformComponent target) {

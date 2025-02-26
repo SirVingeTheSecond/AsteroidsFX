@@ -5,11 +5,12 @@ import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.components.TagComponent;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
+import dk.sdu.mmmi.cbse.common.services.IPluginLifecycle;
 
 /**
  * Plugin for managing asteroids in the game.
  */
-public class AsteroidPlugin implements IGamePluginService {
+public class AsteroidPlugin implements IGamePluginService, IPluginLifecycle {
     private static final int ASTEROIDS_TO_SPAWN = 4;
     private final AsteroidFactory asteroidFactory;
 
@@ -19,13 +20,16 @@ public class AsteroidPlugin implements IGamePluginService {
 
     @Override
     public void start(GameData gameData, World world) {
-        System.out.println("AsteroidPlugin.start() called - spawning " + ASTEROIDS_TO_SPAWN + " asteroids");
+        System.out.println("AsteroidPlugin.start() called - attempting to spawn " + ASTEROIDS_TO_SPAWN + " asteroids");
 
         // Spawn initial asteroids
         for (int i = 0; i < ASTEROIDS_TO_SPAWN; i++) {
             Entity asteroid = asteroidFactory.createEntity(gameData);
             world.addEntity(asteroid);
+            System.out.println("Asteroid " + i + " created with ID: " + asteroid.getID());
         }
+
+        System.out.println("World now contains " + world.getEntities().size() + " entities");
     }
 
     @Override

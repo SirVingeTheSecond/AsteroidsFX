@@ -1,5 +1,6 @@
 package dk.sdu.mmmi.cbse.movementsystem;
 
+import dk.sdu.mmmi.cbse.common.components.TagComponent;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.components.TransformComponent;
@@ -48,10 +49,16 @@ public class MovementSystem implements IEntityProcessingService {
                     break;
             }
 
-            // Apply rotation (if any)
-            if (Math.abs(movement.getRotationSpeed()) > 0.0001f) {
+            // Apply rotation (if any) - but NOT for player
+            TagComponent tagComponent = entity.getComponent(TagComponent.class);
+            boolean isPlayer = tagComponent != null && tagComponent.hasTag(TagComponent.TAG_PLAYER);
+
+            if (!isPlayer && Math.abs(movement.getRotationSpeed()) > 0.0001f) {
                 transform.setRotation(transform.getRotation() + movement.getRotationSpeed());
             }
+
+            // Handle screen wrapping for ALL entities
+            handleScreenWrap(transform, gameData);
         }
     }
 
@@ -87,5 +94,23 @@ public class MovementSystem implements IEntityProcessingService {
 
         // Apply linear movement in current direction
         processLinearMovement(transform, movement);
+    }
+
+    private void handleScreenWrap(TransformComponent transform, GameData gameData) {
+        // Properly wrap - ensure entities never get stuck at edges
+        // Add a small buffer to prevent edge cases
+        float buffer = 5.0f;
+
+        if (transform.getX() < -buffer) {
+            transform.setX(gameData.getDisplayWidth() + buffer);
+        } else if (transform.getX() > gameData.getDisplayWidth() + buffer) {
+            transform.setX(-buffer);
+        }
+
+        if (transform.getY() < -buffer) {
+            transform.setY(gameData.getDisplayHeight() + buffer);
+        } else if (transform.getY() > gameData.getDisplayHeight() + buffer) {
+            transform.setY(-buffer);
+        }
     }
 }

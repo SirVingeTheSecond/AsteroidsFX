@@ -24,6 +24,8 @@
         <module>Movement</module>
         <module>CommonCollision</module>
         <module>CommonEnemy</module>
+        <module>RenderSystem</module>
+        <module>InputSystem</module>
     </modules>
     <properties>
         <java>java</java>
