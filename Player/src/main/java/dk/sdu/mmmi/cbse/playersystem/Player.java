@@ -3,9 +3,11 @@ package dk.sdu.mmmi.cbse.playersystem;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 
 /**
- *
- * @author Emil
+ * Player class - deprecated in favor of component-based approach.
+ * @deprecated Use PlayerFactory to create player entities with components instead.
  */
+@Deprecated
 public class Player extends Entity {
-
+    // This class is kept for backward compatibility only.
+    // New code should use PlayerFactory and standard entity instances with components.
 }

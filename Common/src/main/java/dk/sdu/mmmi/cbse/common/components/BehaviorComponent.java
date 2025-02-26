@@ -21,7 +21,7 @@ public class BehaviorComponent implements Component {
     }
 
     /**
-     * Type-safe getter for behavior with expected enum type
+     * Getter for behavior with expected enum type
      * @param <T> Enum type expected
      * @param enumClass Class of enum expected
      * @return Behavior cast to the expected enum type, or null if type mismatch

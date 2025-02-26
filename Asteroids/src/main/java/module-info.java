@@ -5,6 +5,8 @@ module Asteroid {
 
     exports dk.sdu.mmmi.cbse.asteroid;
 
+    uses dk.sdu.mmmi.cbse.common.services.IGameEventService;
+
     provides dk.sdu.mmmi.cbse.common.services.IGamePluginService
             with dk.sdu.mmmi.cbse.asteroid.AsteroidPlugin;
     provides dk.sdu.mmmi.cbse.common.services.IEntityProcessingService

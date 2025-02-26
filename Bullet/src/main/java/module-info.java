@@ -6,6 +6,7 @@ module Bullet {
     requires java.desktop;
     requires Player;
     requires CommonBullet;
+    requires CommonCollision;
     requires Common;
 
     provides IEntityProcessingService with dk.sdu.mmmi.cbse.bulletsystem.BulletControlSystem;
