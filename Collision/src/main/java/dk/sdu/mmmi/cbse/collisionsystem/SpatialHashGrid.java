@@ -1,12 +1,10 @@
+/**
 package dk.sdu.mmmi.cbse.collisionsystem;
 
 import dk.sdu.mmmi.cbse.common.data.Entity;
 
 import java.util.*;
 
-/**
- * Spatial hash grid for broad-phase collision detection
- */
 class SpatialHashGrid {
     private final int cellSize;
     private final Map<Long, List<Entity>> grid = new HashMap<>();
@@ -62,3 +60,4 @@ class SpatialHashGrid {
         return (((long) x) << 32) | (y & 0xFFFFFFFFL);
     }
 }
+**/

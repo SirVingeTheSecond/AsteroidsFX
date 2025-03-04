@@ -73,7 +73,6 @@ public class AsteroidFactory implements IEntityFactory<Entity> {
         movement.setPattern(MovementComponent.MovementPattern.LINEAR);
         movement.setSpeed(MIN_SPEED + random.nextFloat() * (MAX_SPEED - MIN_SPEED));
         movement.setRotationSpeed(MIN_ROTATION_SPEED + random.nextFloat() * (MAX_ROTATION_SPEED - MIN_ROTATION_SPEED));
-        //movement.setRotationSpeed((random.nextFloat() * 2 - 1) * MAX_ROTATION_SPEED * 0.5f);
 
         // If this is a split asteroid with a parent, inherit some of parent's momentum
         if (parent != null && parent.hasComponent(MovementComponent.class)) {
@@ -109,8 +108,7 @@ public class AsteroidFactory implements IEntityFactory<Entity> {
      * @return Array of new asteroid entities
      */
     public Entity[] createSplitAsteroids(Entity parent, int count, GameData gameData) {
-        if (!parent.hasComponent(AsteroidComponent.class) ||
-                !parent.hasComponent(TransformComponent.class)) {
+        if (!parent.hasComponent(AsteroidComponent.class) || !parent.hasComponent(TransformComponent.class)) {
             return new Entity[0];
         }
 
@@ -118,7 +116,7 @@ public class AsteroidFactory implements IEntityFactory<Entity> {
         TransformComponent transform = parent.getComponent(TransformComponent.class);
 
         // Check if asteroid can be split
-        if (!asteroidComponent.canSplit() || transform.getRadius() < 10) {
+        if (asteroidComponent.getSplitCount() >= asteroidComponent.getMaxSplits() || transform.getRadius() < 10) {
             return new Entity[0];
         }
 
@@ -138,15 +136,18 @@ public class AsteroidFactory implements IEntityFactory<Entity> {
      */
     private double[] generateAsteroidShape(float size) {
         int vertices = 8;
-        double[] shape = new double[vertices * 2];
+        double[] shape = new double[vertices * 2]; // Creates an array with 16 elements (8 vertices * 2 coordinates)
         double angleStep = 360.0 / vertices;
 
         for (int i = 0; i < vertices; i++) {
             double angle = Math.toRadians(i * angleStep);
             // Randomize radius slightly for more natural shape
             double radius = size * (0.8 + random.nextDouble() * 0.4);
-            shape[i * 2] = Math.cos(angle) * radius;
-            shape[i * 2 + 1] = Math.sin(angle) * radius;
+
+            // Store x,y coordinates in the array
+            int index = i * 2;
+            shape[index] = Math.cos(angle) * radius;       // x coordinate
+            shape[index + 1] = Math.sin(angle) * radius;   // y coordinate
         }
 
         return shape;

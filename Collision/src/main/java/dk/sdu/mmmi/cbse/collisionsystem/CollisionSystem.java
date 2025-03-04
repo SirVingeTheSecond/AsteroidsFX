@@ -7,14 +7,16 @@ import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.events.CollisionEvent;
+import dk.sdu.mmmi.cbse.common.services.ICollisionService;
 import dk.sdu.mmmi.cbse.common.services.IGameEventService;
 import dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService;
 
 import java.util.*;
 
-public class CollisionSystem implements IPostEntityProcessingService {
+public class CollisionSystem implements IPostEntityProcessingService, ICollisionService {
     private final CollisionDetector detector;
     private final IGameEventService eventService;
+    private boolean debugEnabled = false;
 
     public CollisionSystem() {
         this.detector = new CollisionDetector();
@@ -23,6 +25,16 @@ public class CollisionSystem implements IPostEntityProcessingService {
         ServiceLoader<IGameEventService> eventLoader = ServiceLoader.load(IGameEventService.class);
         this.eventService = eventLoader.findFirst()
                 .orElseThrow(() -> new RuntimeException("No IGameEventService implementation found"));
+    }
+
+    @Override
+    public void setDebugEnabled(boolean enabled) {
+        this.debugEnabled = enabled;
+    }
+
+    @Override
+    public boolean isDebugEnabled() {
+        return debugEnabled;
     }
 
     @Override

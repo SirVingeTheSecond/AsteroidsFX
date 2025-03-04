@@ -1,5 +1,6 @@
 package dk.sdu.mmmi.cbse.main;
 
+import dk.sdu.mmmi.cbse.common.components.TransformComponent;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
@@ -91,10 +92,11 @@ public class Game {
 
     // ... rest of the Game class implementation ...
     private Polygon createPolygonForEntity(Entity entity) {
-        Polygon polygon = new Polygon(entity.getPolygonCoordinates());
-        polygon.setTranslateX(entity.getX());
-        polygon.setTranslateY(entity.getY());
-        polygon.setRotate(entity.getRotation());
+        TransformComponent transform = new TransformComponent();
+        Polygon polygon = new Polygon(transform.getPolygonCoordinates());
+        polygon.setTranslateX(transform.getX());
+        polygon.setTranslateY(transform.getY());
+        polygon.setRotate(transform.getRotation());
         polygon.setStroke(javafx.scene.paint.Color.WHITE);
         polygon.setFill(javafx.scene.paint.Color.TRANSPARENT);
         return polygon;
@@ -150,9 +152,10 @@ public class Game {
             }
 
             // Update polygon position and rotation
-            polygon.setTranslateX(entity.getX());
-            polygon.setTranslateY(entity.getY());
-            polygon.setRotate(entity.getRotation());
+            TransformComponent transform = new TransformComponent();
+            polygon.setTranslateX(transform.getX());
+            polygon.setTranslateY(transform.getY());
+            polygon.setRotate(transform.getRotation());
 
             if (!gameWindow.getChildren().contains(polygon)) {
                 gameWindow.getChildren().add(polygon);

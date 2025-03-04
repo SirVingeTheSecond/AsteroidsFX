@@ -18,7 +18,7 @@ public class Entity implements Serializable {
     private final Map<Class<?>, Component> components = new ConcurrentHashMap<>();
 
     public Entity() {
-        // Add a transform component by default for backwards compatibility
+        // Add a transform component by default
         addComponent(new TransformComponent());
     }
 
@@ -60,68 +60,5 @@ public class Entity implements Serializable {
      */
     public <T extends Component> boolean hasComponent(Class<T> componentType) {
         return components.containsKey(componentType);
-    }
-
-    // COMPATIBILITY METHODS - These will delegate to the TransformComponent
-    // These methods maintain backward compatibility during refactoring
-
-    public double getX() {
-        TransformComponent transform = getComponent(TransformComponent.class);
-        return transform != null ? transform.getX() : 0;
-    }
-
-    public void setX(double x) {
-        TransformComponent transform = getComponent(TransformComponent.class);
-        if (transform != null) {
-            transform.setX(x);
-        }
-    }
-
-    public double getY() {
-        TransformComponent transform = getComponent(TransformComponent.class);
-        return transform != null ? transform.getY() : 0;
-    }
-
-    public void setY(double y) {
-        TransformComponent transform = getComponent(TransformComponent.class);
-        if (transform != null) {
-            transform.setY(y);
-        }
-    }
-
-    public double getRotation() {
-        TransformComponent transform = getComponent(TransformComponent.class);
-        return transform != null ? transform.getRotation() : 0;
-    }
-
-    public void setRotation(double rotation) {
-        TransformComponent transform = getComponent(TransformComponent.class);
-        if (transform != null) {
-            transform.setRotation(rotation);
-        }
-    }
-
-    public float getRadius() {
-        TransformComponent transform = getComponent(TransformComponent.class);
-        return transform != null ? transform.getRadius() : 0;
-    }
-
-    public void setRadius(float radius) {
-        TransformComponent transform = getComponent(TransformComponent.class);
-        if (transform != null) {
-            transform.setRadius(radius);
-        }
-    }
-
-    public double[] getPolygonCoordinates() {
-        TransformComponent transform = getComponent(TransformComponent.class);
-        return transform != null ? transform.getPolygonCoordinates() : null;
-    }
-
-    public void setPolygonCoordinates(double... coordinates) {
-        TransformComponent transform = getComponent(TransformComponent.class);
-        if (transform != null) {
-            transform.setPolygonCoordinates(coordinates);
-        }
     }
 }

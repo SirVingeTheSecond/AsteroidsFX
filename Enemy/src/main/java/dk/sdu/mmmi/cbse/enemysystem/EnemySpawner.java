@@ -2,10 +2,11 @@ package dk.sdu.mmmi.cbse.enemysystem;
 
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
-import dk.sdu.mmmi.cbse.common.enemy.EnemyProperties;
-import dk.sdu.mmmi.cbse.common.enemy.IEnemySpawner;
-import dk.sdu.mmmi.cbse.common.enemy.IEnemyFactory;
 import dk.sdu.mmmi.cbse.common.enemy.EnemyBehavior;
+import dk.sdu.mmmi.cbse.common.enemy.EnemyProperties;
+import dk.sdu.mmmi.cbse.common.enemy.IEnemyFactory;
+import dk.sdu.mmmi.cbse.common.enemy.IEnemySpawner;
+import dk.sdu.mmmi.cbse.common.components.TagComponent;
 
 import java.util.Random;
 import java.util.ServiceLoader;
@@ -16,7 +17,7 @@ public class EnemySpawner implements IEnemySpawner {
     private float difficultyMultiplier = 1.0f;
     private float spawnTimer = 0;
     private final Random rnd = new Random();
-    private IEnemyFactory enemyFactory;
+    private final IEnemyFactory enemyFactory;
 
     public EnemySpawner() {
         // Load EnemyFactory in constructor using ServiceLoader
@@ -27,7 +28,15 @@ public class EnemySpawner implements IEnemySpawner {
 
     @Override
     public void spawnEnemies(GameData gameData, World world) {
-        if (world.getEntities(EnemyShip.class).size() >= maxEnemies) {
+        // Count current enemies using tag component
+        long enemyCount = world.getEntities().stream()
+                .filter(e -> {
+                    TagComponent tc = e.getComponent(TagComponent.class);
+                    return tc != null && tc.hasTag(TagComponent.TAG_ENEMY);
+                })
+                .count();
+
+        if (enemyCount >= maxEnemies) {
             return;
         }
 
@@ -37,6 +46,8 @@ public class EnemySpawner implements IEnemySpawner {
             applyDifficultyMultiplier(properties);
             world.addEntity(enemyFactory.createEnemy(gameData, behavior, properties));
             spawnTimer = spawnInterval;
+        } else {
+            spawnTimer--;
         }
     }
 

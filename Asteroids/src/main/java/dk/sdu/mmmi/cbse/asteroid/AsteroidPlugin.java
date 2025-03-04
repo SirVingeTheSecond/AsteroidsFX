@@ -7,12 +7,16 @@ import dk.sdu.mmmi.cbse.common.components.TagComponent;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 import dk.sdu.mmmi.cbse.common.services.IPluginLifecycle;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Plugin for managing asteroids in the game.
  */
 public class AsteroidPlugin implements IGamePluginService, IPluginLifecycle {
     private static final int ASTEROIDS_TO_SPAWN = 4;
     private final AsteroidFactory asteroidFactory;
+    private final List<Entity> asteroids = new ArrayList<>(); // Changed from Asteroid to Entity
 
     public AsteroidPlugin() {
         this.asteroidFactory = new AsteroidFactory();
@@ -26,6 +30,7 @@ public class AsteroidPlugin implements IGamePluginService, IPluginLifecycle {
         for (int i = 0; i < ASTEROIDS_TO_SPAWN; i++) {
             Entity asteroid = asteroidFactory.createEntity(gameData);
             world.addEntity(asteroid);
+            asteroids.add(asteroid); // No cast needed
             System.out.println("Asteroid " + i + " created with ID: " + asteroid.getID());
         }
 
@@ -35,7 +40,13 @@ public class AsteroidPlugin implements IGamePluginService, IPluginLifecycle {
     @Override
     public void stop(GameData gameData, World world) {
         System.out.println("AsteroidPlugin.stop() called - removing all asteroids");
-        // Remove all asteroids
+
+        for (Entity asteroid : asteroids) {
+            world.removeEntity(asteroid);
+        }
+        asteroids.clear();
+
+        // Force remove all asteroids
         for (Entity entity : world.getEntities()) {
             TagComponent tagComponent = entity.getComponent(TagComponent.class);
             if (tagComponent != null && tagComponent.hasTag(TagComponent.TAG_ASTEROID)) {

@@ -1,3 +1,4 @@
+// BulletPlugin.java (improved)
 package dk.sdu.mmmi.cbse.bulletsystem;
 
 import dk.sdu.mmmi.cbse.common.data.Entity;
@@ -11,6 +12,7 @@ import java.util.ServiceLoader;
 
 public class BulletPlugin implements IGamePluginService {
     private final IGameEventService eventService;
+    private ShootSystem shootSystem;
 
     public BulletPlugin() {
         this.eventService = ServiceLoader.load(IGameEventService.class)
@@ -20,9 +22,8 @@ public class BulletPlugin implements IGamePluginService {
 
     @Override
     public void start(GameData gameData, World world) {
-        // Register the ShootSystem to listen for ShootEvents
-        // Is this a smart approach?
-        ShootSystem shootSystem = new ShootSystem();
+        // The ShootSystem is instantiated as an entity processing service through ServiceLoader
+        // No need to manually create it here - it will be automatically loaded by the core
     }
 
     @Override

@@ -19,13 +19,13 @@
         <module>CommonAsteroids</module>
         <module>Asteroids</module>
         <module>Collision</module>
-        <module>ScoringSystem</module>
         <module>Enemy</module>
         <module>Movement</module>
         <module>CommonCollision</module>
         <module>CommonEnemy</module>
         <module>RenderSystem</module>
         <module>InputSystem</module>
+        <module>Health</module>
     </modules>
     <properties>
         <java>java</java>

@@ -1,6 +1,4 @@
-package dk.sdu.mmmi.cbse.playersystem;
-
-import dk.sdu.mmmi.cbse.common.components.Component;
+package dk.sdu.mmmi.cbse.common.components;
 
 /**
  * Component that identifies an entity as a player.

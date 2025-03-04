@@ -1,3 +1,4 @@
+// ShootSystem.java (Improved)
 package dk.sdu.mmmi.cbse.bulletsystem;
 
 import dk.sdu.mmmi.cbse.common.bullet.BulletSPI;
@@ -8,15 +9,14 @@ import dk.sdu.mmmi.cbse.common.components.TransformComponent;
 import dk.sdu.mmmi.cbse.common.events.IGameEventListener;
 import dk.sdu.mmmi.cbse.common.events.ShootEvent;
 import dk.sdu.mmmi.cbse.common.services.IGameEventService;
-import dk.sdu.mmmi.cbse.common.events.IEventProcessor;
+import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 
 import java.util.ServiceLoader;
 
 /**
  * System that responds to ShootEvents by creating bullets.
- * This separates the shooting logic from entity processing systems.
  */
-public class ShootSystem implements IEventProcessor, IGameEventListener<ShootEvent> {
+public class ShootSystem implements IEntityProcessingService, IGameEventListener<ShootEvent> {
     private final BulletSPI bulletSPI;
     private final IGameEventService eventService;
     private World world;
@@ -37,13 +37,10 @@ public class ShootSystem implements IEventProcessor, IGameEventListener<ShootEve
     }
 
     @Override
-    public void processEvents(GameData gameData, World world) {
+    public void process(GameData gameData, World world) {
         // Store references for use in event handling
         this.world = world;
         this.gameData = gameData;
-
-        // We don't need to do any regular processing here
-        // All work is done in response to events
     }
 
     @Override
@@ -65,14 +62,9 @@ public class ShootSystem implements IEventProcessor, IGameEventListener<ShootEve
     }
 
     private Entity createBullet(Entity shooter, ShootEvent event) {
-        // Get the transform component to determine bullet position/direction
-        TransformComponent shooterTransform = shooter.getComponent(TransformComponent.class);
-        if (shooterTransform == null) {
-            return null;
-        }
-
         // Create bullet using BulletSPI
         Entity bullet = bulletSPI.createBullet(shooter, gameData);
+        if (bullet == null) return null;
 
         // If the event has a direction override, apply it
         if (event.hasDirectionOverride()) {

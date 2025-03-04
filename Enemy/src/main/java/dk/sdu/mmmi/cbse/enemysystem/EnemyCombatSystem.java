@@ -1,54 +1,86 @@
 package dk.sdu.mmmi.cbse.enemysystem;
 
-import dk.sdu.mmmi.cbse.common.bullet.BulletSPI;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
-import dk.sdu.mmmi.cbse.common.enemy.IEnemyShip;
+import dk.sdu.mmmi.cbse.common.components.AIComponent;
+import dk.sdu.mmmi.cbse.common.components.CombatComponent;
+import dk.sdu.mmmi.cbse.common.components.ShootingComponent;
+import dk.sdu.mmmi.cbse.common.components.TagComponent;
+import dk.sdu.mmmi.cbse.common.components.TransformComponent;
+import dk.sdu.mmmi.cbse.common.events.ShootEvent;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
+import dk.sdu.mmmi.cbse.common.services.IGameEventService;
 
-import java.util.Collection;
 import java.util.Random;
 import java.util.ServiceLoader;
-import java.util.stream.Collectors;
 
 public class EnemyCombatSystem implements IEntityProcessingService {
-    private Collection<? extends BulletSPI> bulletSPIs;
     private final Random random = new Random();
+    private final IGameEventService eventService;
 
     public EnemyCombatSystem() {
-        // Load BulletSPIs in constructor using ServiceLoader
-        this.bulletSPIs = ServiceLoader.load(BulletSPI.class)
-                .stream()
-                .map(ServiceLoader.Provider::get)
-                .collect(Collectors.toList());
+        this.eventService = ServiceLoader.load(IGameEventService.class)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No IGameEventService implementation found"));
     }
 
     @Override
     public void process(GameData gameData, World world) {
-        Entity player = EnemyUtils.findPlayer(world);
+        for (Entity enemy : world.getEntities()) {
+            // Skip entities that aren't enemies or missing required components
+            if (!isEnemy(enemy) || !hasRequiredComponents(enemy)) {
+                continue;
+            }
 
-        for (Entity entity : world.getEntities(EnemyShip.class)) {
-            IEnemyShip enemy = (IEnemyShip) entity;
+            AIComponent ai = enemy.getComponent(AIComponent.class);
+            CombatComponent combat = enemy.getComponent(CombatComponent.class);
+            ShootingComponent shooting = enemy.getComponent(ShootingComponent.class);
+            TransformComponent transform = enemy.getComponent(TransformComponent.class);
 
-            if (shouldShoot(entity, player, enemy)) {
-                shoot(entity, gameData, world);
+            // Update shooting cooldown
+            if (shooting != null) {
+                shooting.updateCooldown();
+            }
+
+            // Get target if available
+            Entity target = ai.getTarget();
+            if (target == null) continue;
+
+            TransformComponent targetTransform = target.getComponent(TransformComponent.class);
+            if (targetTransform == null) continue;
+
+            // Check if target is in range and we can shoot
+            float distanceToTarget = calculateDistance(transform, targetTransform);
+            if (distanceToTarget <= combat.getAttackRange() &&
+                    (shooting == null || shooting.canShoot()) &&
+                    random.nextFloat() < 0.05) { // 5% chance to shoot per frame
+
+                // Reset cooldown if we have a shooting component
+                if (shooting != null) {
+                    shooting.resetCooldown();
+                }
+
+                // Trigger shoot event
+                eventService.publish(new ShootEvent(enemy));
             }
         }
     }
 
-    private boolean shouldShoot(Entity entity, Entity player, IEnemyShip enemy) {
-        if (player == null) return false;
-
-        double range = EnemyUtils.calculateDistance(entity, player);
-        return range <= enemy.getProperties().getShootingRange()
-                && EnemyUtils.hasLineOfSight(entity, player)
-                && random.nextFloat() < 0.1;
+    private boolean isEnemy(Entity entity) {
+        TagComponent tagComponent = entity.getComponent(TagComponent.class);
+        return tagComponent != null && tagComponent.hasTag(TagComponent.TAG_ENEMY);
     }
 
-    private void shoot(Entity entity, GameData gameData, World world) {
-        bulletSPIs.stream().findFirst().ifPresent(
-                bulletSPI -> world.addEntity(bulletSPI.createBullet(entity, gameData))
-        );
+    private boolean hasRequiredComponents(Entity entity) {
+        return entity.hasComponent(AIComponent.class) &&
+                entity.hasComponent(CombatComponent.class) &&
+                entity.hasComponent(TransformComponent.class);
+    }
+
+    private float calculateDistance(TransformComponent t1, TransformComponent t2) {
+        double dx = t2.getX() - t1.getX();
+        double dy = t2.getY() - t1.getY();
+        return (float) Math.sqrt(dx * dx + dy * dy);
     }
 }

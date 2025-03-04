@@ -1,11 +1,7 @@
 package dk.sdu.mmmi.cbse.playersystem;
 
+import dk.sdu.mmmi.cbse.common.components.*;
 import dk.sdu.mmmi.cbse.common.data.Entity;
-import dk.sdu.mmmi.cbse.common.components.TransformComponent;
-import dk.sdu.mmmi.cbse.common.components.MovementComponent;
-import dk.sdu.mmmi.cbse.common.components.ShootingComponent;
-import dk.sdu.mmmi.cbse.common.components.HealthComponent;
-import dk.sdu.mmmi.cbse.common.components.TagComponent;
 import dk.sdu.mmmi.cbse.common.collision.CollisionComponent;
 import dk.sdu.mmmi.cbse.common.collision.CollisionLayer;
 import dk.sdu.mmmi.cbse.common.collision.CollisionGroup;

@@ -1,0 +1,4 @@
+module Health {
+    requires Common;
+
+}

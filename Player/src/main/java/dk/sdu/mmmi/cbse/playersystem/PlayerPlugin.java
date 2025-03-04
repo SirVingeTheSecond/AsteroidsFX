@@ -29,8 +29,6 @@ public class PlayerPlugin implements IGamePluginService, IPluginLifecycle {
         world.addEntity(player);
 
         System.out.println("Player created with ID: " + player.getID());
-        System.out.println("Player position: X=" + player.getX() + ", Y=" + player.getY());
-        System.out.println("Player has TransformComponent: " + player.hasComponent(TransformComponent.class));
     }
 
     @Override

@@ -14,6 +14,8 @@ public class KeyboardInputSystem implements IInputService {
                 case RIGHT -> gameData.getKeys().setKey(GameKeys.RIGHT, true);
                 case UP -> gameData.getKeys().setKey(GameKeys.UP, true);
                 case SPACE -> gameData.getKeys().setKey(GameKeys.SPACE, true);
+                case ESCAPE -> gameData.getKeys().setKey(GameKeys.ESCAPE, true);
+                case F3 -> gameData.getKeys().setKey(GameKeys.DEBUG, true);
             }
         });
 
@@ -23,14 +25,14 @@ public class KeyboardInputSystem implements IInputService {
                 case RIGHT -> gameData.getKeys().setKey(GameKeys.RIGHT, false);
                 case UP -> gameData.getKeys().setKey(GameKeys.UP, false);
                 case SPACE -> gameData.getKeys().setKey(GameKeys.SPACE, false);
+                case ESCAPE -> gameData.getKeys().setKey(GameKeys.ESCAPE, false);
+                case F3 -> gameData.getKeys().setKey(GameKeys.DEBUG, false);
             }
         });
     }
 
     @Override
     public void processInput(GameData gameData) {
-        // Could process inputs if needed beyond direct key handling
-        // Update gameData keys
         gameData.getKeys().update();
     }
 
