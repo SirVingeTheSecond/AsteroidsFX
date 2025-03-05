@@ -1,83 +1,78 @@
 package dk.sdu.mmmi.cbse.common.components;
 
-import java.util.HashSet;
+import dk.sdu.mmmi.cbse.common.data.EntityType;
+
+import java.util.EnumSet;
 import java.util.Set;
 
 /**
- * Component that stores tags for identifying entity types and properties.
- * Allows for flexible entity categorization without using inheritance.
+ * Component that stores entity types for identification and categorization.
+ * Uses enum-based approach for type safety and better IDE support.
  */
 public class TagComponent implements Component {
-
-    // Tags should probably be stored as a separate Enum?
-    public static final String TAG_PLAYER = "player";
-    public static final String TAG_ENEMY = "enemy";
-    public static final String TAG_ASTEROID = "asteroid";
-    public static final String TAG_BULLET = "bullet";
-    public static final String TAG_POWERUP = "powerup";
-
-    private final Set<String> tags = new HashSet<>();
+    private final EnumSet<EntityType> types;
 
     /**
-     * Create a TagComponent with no initial tags.
+     * Create a TagComponent with no initial types.
      */
     public TagComponent() {
-        // Empty constructor
+        this.types = EnumSet.noneOf(EntityType.class);
     }
 
     /**
-     * Create a TagComponent with initial tags.
-     * @param initialTags Initial tags to add
+     * Create a TagComponent with initial entity types.
+     * @param initialTypes Initial entity types to add
      */
-    public TagComponent(String... initialTags) {
-        if (initialTags != null) {
-            for (String tag : initialTags) {
-                addTag(tag);
+    public TagComponent(EntityType... initialTypes) {
+        this.types = EnumSet.noneOf(EntityType.class);
+        if (initialTypes != null) {
+            for (EntityType type : initialTypes) {
+                addType(type);
             }
         }
     }
 
     /**
-     * Add a tag to this entity.
-     * @param tag Tag to add
+     * Add an entity type to this entity.
+     * @param type EntityType to add
      */
-    public void addTag(String tag) {
-        if (tag != null && !tag.isEmpty()) {
-            tags.add(tag.toLowerCase());
+    public void addType(EntityType type) {
+        if (type != null) {
+            types.add(type);
         }
     }
 
     /**
-     * Remove a tag from this entity.
-     * @param tag Tag to remove
+     * Remove an entity type from this entity.
+     * @param type EntityType to remove
      */
-    public void removeTag(String tag) {
-        if (tag != null) {
-            tags.remove(tag.toLowerCase());
+    public void removeType(EntityType type) {
+        if (type != null) {
+            types.remove(type);
         }
     }
 
     /**
-     * Check if entity has a specific tag.
-     * @param tag Tag to check
-     * @return true if entity has the tag, false otherwise
+     * Check if entity has a specific entity type.
+     * @param type EntityType to check
+     * @return true if entity has the type, false otherwise
      */
-    public boolean hasTag(String tag) {
-        return tag != null && tags.contains(tag.toLowerCase());
+    public boolean hasType(EntityType type) {
+        return type != null && types.contains(type);
     }
 
     /**
-     * Check if entity has all the specified tags.
-     * @param tagList Tags to check
-     * @return true if entity has all tags, false otherwise
+     * Check if entity has all the specified types.
+     * @param typeList Types to check
+     * @return true if entity has all types, false otherwise
      */
-    public boolean hasAllTags(String... tagList) {
-        if (tagList == null) {
+    public boolean hasAllTypes(EntityType... typeList) {
+        if (typeList == null) {
             return true;
         }
 
-        for (String tag : tagList) {
-            if (!hasTag(tag)) {
+        for (EntityType type : typeList) {
+            if (!hasType(type)) {
                 return false;
             }
         }
@@ -85,17 +80,17 @@ public class TagComponent implements Component {
     }
 
     /**
-     * Check if entity has any of the specified tags.
-     * @param tagList Tags to check
-     * @return true if entity has at least one tag, false otherwise
+     * Check if entity has any of the specified types.
+     * @param typeList Types to check
+     * @return true if entity has at least one type, false otherwise
      */
-    public boolean hasAnyTag(String... tagList) {
-        if (tagList == null) {
+    public boolean hasAnyType(EntityType... typeList) {
+        if (typeList == null) {
             return false;
         }
 
-        for (String tag : tagList) {
-            if (hasTag(tag)) {
+        for (EntityType type : typeList) {
+            if (hasType(type)) {
                 return true;
             }
         }
@@ -103,17 +98,17 @@ public class TagComponent implements Component {
     }
 
     /**
-     * Get all tags for this entity.
-     * @return Unmodifiable set of tags
+     * Get all entity types for this entity.
+     * @return Unmodifiable set of types
      */
-    public Set<String> getTags() {
-        return new HashSet<>(tags);
+    public Set<EntityType> getTypes() {
+        return EnumSet.copyOf(types);
     }
 
     /**
-     * Clear all tags from this entity.
+     * Clear all types from this entity.
      */
-    public void clearTags() {
-        tags.clear();
+    public void clearTypes() {
+        types.clear();
     }
 }

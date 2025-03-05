@@ -2,7 +2,6 @@ module Bullet {
     requires Common;
     requires CommonBullet;
     requires CommonCollision;
-    requires Player;
 
     uses dk.sdu.mmmi.cbse.common.services.IGameEventService;
     uses dk.sdu.mmmi.cbse.common.bullet.BulletSPI;

@@ -8,7 +8,6 @@ import dk.sdu.mmmi.cbse.common.enemy.EnemyBehavior;
 import dk.sdu.mmmi.cbse.common.enemy.EnemyProperties;
 import dk.sdu.mmmi.cbse.common.enemy.IEnemyFactory;
 import dk.sdu.mmmi.cbse.common.services.IGameEventService;
-import dk.sdu.mmmi.cbse.common.services.IPluginLifecycle;
 
 import java.util.ArrayList;
 import java.util.List;

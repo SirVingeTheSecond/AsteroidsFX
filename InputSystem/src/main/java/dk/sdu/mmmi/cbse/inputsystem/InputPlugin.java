@@ -2,7 +2,6 @@ package dk.sdu.mmmi.cbse.inputsystem;
 
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
-import dk.sdu.mmmi.cbse.common.services.IPluginLifecycle;
 
 /**
  * Plugin for the Input module - handles startup and shutdown

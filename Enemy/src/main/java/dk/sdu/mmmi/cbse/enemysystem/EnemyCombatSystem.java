@@ -53,7 +53,7 @@ public class EnemyCombatSystem implements IEntityProcessingService {
             // Check if target is in range and we can shoot
             float distanceToTarget = calculateDistance(transform, targetTransform);
             if (distanceToTarget <= combat.getAttackRange() &&
-                    (shooting == null || shooting.canShoot()) &&
+                    (shooting == null || shooting.isCanShoot()) &&
                     random.nextFloat() < 0.05) { // 5% chance to shoot per frame
 
                 // Reset cooldown if we have a shooting component

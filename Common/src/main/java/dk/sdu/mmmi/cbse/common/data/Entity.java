@@ -1,7 +1,6 @@
 package dk.sdu.mmmi.cbse.common.data;
 
 import dk.sdu.mmmi.cbse.common.components.Component;
-import dk.sdu.mmmi.cbse.common.components.TransformComponent;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -17,9 +16,12 @@ public class Entity implements Serializable {
     private final UUID ID = UUID.randomUUID();
     private final Map<Class<?>, Component> components = new ConcurrentHashMap<>();
 
+    /**
+     * Creates a new entity with no components.
+     * Components should be added explicitly by systems based on entity requirements.
+     */
     public Entity() {
-        // Add a transform component by default
-        addComponent(new TransformComponent());
+
     }
 
     public String getID() {
