@@ -13,6 +13,6 @@ module Player {
             dk.sdu.mmmi.cbse.playersystem.PlayerMovementSystem,
             dk.sdu.mmmi.cbse.playersystem.PlayerStateSystem;
 
-    provides dk.sdu.mmmi.cbse.common.services.IPluginLifecycle with
+    provides dk.sdu.mmmi.cbse.common.services.IGamePluginService with
             dk.sdu.mmmi.cbse.playersystem.PlayerPlugin;
 }

@@ -11,7 +11,7 @@ module Enemy {
     uses dk.sdu.mmmi.cbse.common.enemy.IEnemyFactory;
     uses dk.sdu.mmmi.cbse.common.enemy.IEnemySpawner;
 
-    provides dk.sdu.mmmi.cbse.common.services.IPluginLifecycle
+    provides dk.sdu.mmmi.cbse.common.services.IGamePluginService
             with dk.sdu.mmmi.cbse.enemysystem.EnemyPlugin;
 
     provides dk.sdu.mmmi.cbse.common.services.IEntityProcessingService

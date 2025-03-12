@@ -3,7 +3,7 @@ package dk.sdu.mmmi.cbse.common.components;
 /**
  * Component that handles shooting-related data for entities.
  */
-public class ShootingComponent implements Component {
+public class ShootingComponent implements IComponent {
     private int cooldownMax;
     private int cooldownRemaining;
     private boolean canShoot;
@@ -20,7 +20,6 @@ public class ShootingComponent implements Component {
         this.projectileLifetime = 60;
     }
 
-    // Simple getters and setters
     public int getCooldownMax() { return cooldownMax; }
     public void setCooldownMax(int cooldownMax) { this.cooldownMax = cooldownMax; }
 
@@ -38,4 +37,24 @@ public class ShootingComponent implements Component {
 
     public int getProjectileLifetime() { return projectileLifetime; }
     public void setProjectileLifetime(int projectileLifetime) { this.projectileLifetime = projectileLifetime; }
+
+    /**
+     * Update the cooldown timer.
+     */
+    public void updateCooldown() {
+        if (cooldownRemaining > 0) {
+            cooldownRemaining--;
+            canShoot = false;
+        } else {
+            canShoot = true;
+        }
+    }
+
+    /**
+     * Reset the cooldown timer after shooting.
+     */
+    public void resetCooldown() {
+        cooldownRemaining = cooldownMax;
+        canShoot = false;
+    }
 }

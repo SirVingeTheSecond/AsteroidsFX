@@ -8,7 +8,7 @@ import dk.sdu.mmmi.cbse.common.data.Entity;
  */
 
 // Is this Component too similar to Movement?
-public class AIComponent implements Component {
+public class AIComponent implements IComponent {
     private float detectionRange;
     private float fleeThreshold; // Health percentage at which entity flees
     private Entity target; // Current target entity

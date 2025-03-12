@@ -8,12 +8,13 @@ import dk.sdu.mmmi.cbse.common.enemy.EnemyBehavior;
 import dk.sdu.mmmi.cbse.common.enemy.EnemyProperties;
 import dk.sdu.mmmi.cbse.common.enemy.IEnemyFactory;
 import dk.sdu.mmmi.cbse.common.services.IGameEventService;
+import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 
-public class EnemyPlugin implements IPluginLifecycle, IEnemyFactory {
+public class EnemyPlugin implements IEnemyFactory, IGamePluginService {
     private final List<Entity> enemies = new ArrayList<>();
     private final IGameEventService eventService;
     private final EnemyFactory enemyFactory;

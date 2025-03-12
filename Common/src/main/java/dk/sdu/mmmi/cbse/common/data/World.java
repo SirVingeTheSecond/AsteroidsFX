@@ -7,8 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *
- * @author jcs
+ * Container for all game entities.
  */
 public class World {
 
@@ -47,5 +46,4 @@ public class World {
     public Entity getEntity(String ID) {
         return entityMap.get(ID);
     }
-
 }

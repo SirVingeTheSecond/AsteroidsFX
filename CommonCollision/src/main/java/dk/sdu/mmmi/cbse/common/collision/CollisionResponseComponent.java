@@ -1,6 +1,6 @@
 package dk.sdu.mmmi.cbse.common.collision;
 
-import dk.sdu.mmmi.cbse.common.components.Component;
+import dk.sdu.mmmi.cbse.common.components.IComponent;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.World;
 
@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * Component that handles collision responses
  */
-public class CollisionResponseComponent implements Component {
+public class CollisionResponseComponent implements IComponent {
     private final Map<CollisionLayer, CollisionResponseHandler> layerResponses = new HashMap<>();
     private final Map<CollisionGroup, CollisionResponseHandler> groupResponses = new HashMap<>();
 

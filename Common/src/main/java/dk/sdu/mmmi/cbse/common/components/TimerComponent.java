@@ -1,6 +1,6 @@
 package dk.sdu.mmmi.cbse.common.components;
 
-public class TimerComponent implements Component {
+public class TimerComponent implements IComponent {
     private float moveTimer;
     private float shootTimer;
 

@@ -2,9 +2,8 @@ package dk.sdu.mmmi.cbse.common.components;
 
 /**
  * Component that represents entity health and related properties.
- * Only stores data, logic should be handled by systems.
  */
-public class HealthComponent implements Component {
+public class HealthComponent implements IComponent {
     private float health;
     private float maxHealth;
 

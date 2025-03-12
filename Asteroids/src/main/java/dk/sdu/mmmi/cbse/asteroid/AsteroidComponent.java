@@ -1,11 +1,11 @@
 package dk.sdu.mmmi.cbse.asteroid;
 
-import dk.sdu.mmmi.cbse.common.components.Component;
+import dk.sdu.mmmi.cbse.common.components.IComponent;
 
 /**
  * Component that contains asteroid-specific properties.
  */
-public class AsteroidComponent implements Component {
+public class AsteroidComponent implements IComponent {
     private int splitCount;
     private int maxSplits = 2;
     private float splitSizeRatio = 0.5f;

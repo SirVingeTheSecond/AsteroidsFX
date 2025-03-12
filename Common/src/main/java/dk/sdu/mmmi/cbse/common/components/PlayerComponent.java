@@ -4,7 +4,7 @@ package dk.sdu.mmmi.cbse.common.components;
  * Component that identifies an entity as a player.
  * This is a tag component to mark player entities.
  */
-public class PlayerComponent implements Component {
+public class PlayerComponent implements IComponent {
     private int lives = 3;
     private int score = 0;
     private boolean isInvulnerable = false;

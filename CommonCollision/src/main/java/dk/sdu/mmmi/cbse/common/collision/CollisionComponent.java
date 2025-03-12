@@ -1,11 +1,11 @@
 package dk.sdu.mmmi.cbse.common.collision;
 
-import dk.sdu.mmmi.cbse.common.components.Component;
+import dk.sdu.mmmi.cbse.common.components.IComponent;
 
 /**
  * Component that defines collision properties for an entity
  */
-public class CollisionComponent implements Component {
+public class CollisionComponent implements IComponent {
     private CollisionLayer layer;
     private int groups;
     private boolean active = true;

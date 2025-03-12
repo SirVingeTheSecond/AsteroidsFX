@@ -5,7 +5,7 @@ package dk.sdu.mmmi.cbse.common.components;
  * Can be used by any entity that has different behavior states.
  * Separates data from behavior in the ECS pattern.
  */
-public class BehaviorComponent implements Component {
+public class BehaviorComponent implements IComponent {
     private Enum<?> behavior;
 
     public BehaviorComponent(Enum<?> defaultBehavior) {

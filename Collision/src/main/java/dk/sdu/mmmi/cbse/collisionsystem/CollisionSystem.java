@@ -1,30 +1,73 @@
 package dk.sdu.mmmi.cbse.collisionsystem;
 
-import dk.sdu.mmmi.cbse.collisionsystem.collision.CollisionDetector;
 import dk.sdu.mmmi.cbse.common.collision.CollisionComponent;
-import dk.sdu.mmmi.cbse.common.collision.CollisionResponseComponent;
+import dk.sdu.mmmi.cbse.common.collision.CollisionPair;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
-import dk.sdu.mmmi.cbse.common.events.CollisionEvent;
 import dk.sdu.mmmi.cbse.common.services.ICollisionService;
 import dk.sdu.mmmi.cbse.common.services.IGameEventService;
 import dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService;
+import dk.sdu.mmmi.cbse.common.util.ServiceLocator;
 
-import java.util.*;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+/**
+ * System that handles collision detection and resolution.
+ * Implements separation of concerns between detection and resolution.
+ */
 public class CollisionSystem implements IPostEntityProcessingService, ICollisionService {
+    private static final Logger LOGGER = Logger.getLogger(CollisionSystem.class.getName());
+
     private final CollisionDetector detector;
+    private final CollisionResolver resolver;
     private final IGameEventService eventService;
+
     private boolean debugEnabled = false;
 
     public CollisionSystem() {
-        this.detector = new CollisionDetector();
-
         // Load required services
-        ServiceLoader<IGameEventService> eventLoader = ServiceLoader.load(IGameEventService.class);
-        this.eventService = eventLoader.findFirst()
-                .orElseThrow(() -> new RuntimeException("No IGameEventService implementation found"));
+        this.eventService = ServiceLocator.getService(IGameEventService.class);
+
+        // Initialize collision components
+        this.detector = new CollisionDetector();
+        this.resolver = new CollisionResolver(eventService);
+    }
+
+    @Override
+    public void process(GameData gameData, World world) {
+        long startTime = System.nanoTime(); // Just call getTime?
+
+        // Clear the detector for this frame
+        detector.clear();
+
+        // Add all entities with collision components to the detector
+        for (Entity entity : world.getEntities()) {
+            CollisionComponent cc = entity.getComponent(CollisionComponent.class);
+            if (cc != null && cc.isActive()) {
+                detector.addEntity(entity);
+            }
+        }
+
+        // Detect all collisions
+        Set<CollisionPair> collisions = detector.detectCollisions();
+
+        // Resolve the collisions
+        resolver.resolveCollisions(collisions, world);
+
+        long endTime = System.nanoTime(); // Just call getTime?
+
+        if (debugEnabled) {
+            LOGGER.log(Level.INFO,
+                    "Collision processing: {0} entities, {1} collisions, {2}ms",
+                    new Object[]{
+                            world.getEntities().size(),
+                            collisions.size(),
+                            (endTime - startTime) / 1_000_000.0
+                    });
+        }
     }
 
     @Override
@@ -35,84 +78,5 @@ public class CollisionSystem implements IPostEntityProcessingService, ICollision
     @Override
     public boolean isDebugEnabled() {
         return debugEnabled;
-    }
-
-    @Override
-    public void process(GameData gameData, World world) {
-        // Clear the spatial partitioning grid
-        detector.clear();
-
-        // Get all entities with collision components
-        List<Entity> collidableEntities = new ArrayList<>();
-        for (Entity entity : world.getEntities()) {
-            CollisionComponent cc = entity.getComponent(CollisionComponent.class);
-            if (cc != null && cc.isActive()) {
-                collidableEntities.add(entity);
-                detector.addToGrid(entity);
-            }
-        }
-
-        // Check for collisions
-        Set<CollisionPair> processedPairs = new HashSet<>();
-
-        for (Entity entity : collidableEntities) {
-            Set<Entity> potentialCollisions = detector.getPotentialCollisions(entity);
-
-            for (Entity other : potentialCollisions) {
-                if (entity == other) continue;
-
-                CollisionPair pair = new CollisionPair(entity, other);
-                if (processedPairs.contains(pair)) continue;
-
-                if (detector.checkCollision(entity, other)) {
-                    handleCollision(entity, other, world);
-                    eventService.publish(new CollisionEvent(entity, entity, other));
-                }
-
-                processedPairs.add(pair);
-            }
-        }
-    }
-
-    private void handleCollision(Entity entity1, Entity entity2, World world) {
-        CollisionResponseComponent response1 = entity1.getComponent(CollisionResponseComponent.class);
-        CollisionResponseComponent response2 = entity2.getComponent(CollisionResponseComponent.class);
-
-        // Handle responses in order if present
-        if (response1 != null) {
-            if (response1.handleCollision(entity1, entity2, world)) {
-                return;
-            }
-        }
-
-        if (response2 != null) {
-            response2.handleCollision(entity2, entity1, world);
-        }
-    }
-
-    private static class CollisionPair {
-        private final String id1;
-        private final String id2;
-
-        public CollisionPair(Entity e1, Entity e2) {
-            id1 = e1.getID();
-            id2 = e2.getID();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            CollisionPair that = (CollisionPair) o;
-            return (Objects.equals(id1, that.id1) && Objects.equals(id2, that.id2)) ||
-                    (Objects.equals(id1, that.id2) && Objects.equals(id2, that.id1));
-        }
-
-        @Override
-        public int hashCode() {
-            return id1.compareTo(id2) < 0
-                    ? Objects.hash(id1, id2)
-                    : Objects.hash(id2, id1);
-        }
     }
 }

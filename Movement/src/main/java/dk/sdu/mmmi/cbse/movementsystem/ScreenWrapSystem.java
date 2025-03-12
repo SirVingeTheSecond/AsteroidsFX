@@ -1,8 +1,9 @@
 package dk.sdu.mmmi.cbse.movementsystem;
 
+import dk.sdu.mmmi.cbse.common.Vector2D;
+import dk.sdu.mmmi.cbse.common.components.TransformComponent;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
-import dk.sdu.mmmi.cbse.common.components.TransformComponent;
 import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService;
 
@@ -26,21 +27,21 @@ public class ScreenWrapSystem implements IPostEntityProcessingService {
     }
 
     private void handleScreenWrap(TransformComponent transform, GameData gameData) {
-        double x = transform.getX();
-        double y = transform.getY();
+        float x = transform.getX();
+        float y = transform.getY();
+        float width = gameData.getDisplayWidth();
+        float height = gameData.getDisplayHeight();
 
-        // Wrap horizontally
-        if (x < 0) {
-            transform.setX(gameData.getDisplayWidth());
-        } else if (x > gameData.getDisplayWidth()) {
-            transform.setX(0);
-        }
+        // Wrap position
+        if (x < 0) x = width;
+        else if (x > width) x = 0;
 
-        // Wrap vertically
-        if (y < 0) {
-            transform.setY(gameData.getDisplayHeight());
-        } else if (y > gameData.getDisplayHeight()) {
-            transform.setY(0);
+        if (y < 0) y = height;
+        else if (y > height) y = 0;
+
+        // If position changed, update the transform
+        if (x != transform.getX() || y != transform.getY()) {
+            transform.setPosition(new Vector2D(x, y));
         }
     }
 }

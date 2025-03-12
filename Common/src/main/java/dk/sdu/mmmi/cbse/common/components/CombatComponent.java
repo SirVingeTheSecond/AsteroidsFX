@@ -4,7 +4,7 @@ package dk.sdu.mmmi.cbse.common.components;
  * Component that contains combat-related properties.
  * This can be used by any entity capable of combat, both players and enemies.
  */
-public class CombatComponent implements Component {
+public class CombatComponent implements IComponent {
     private float damage;
     private float attackRange;
     private float attackSpeed;

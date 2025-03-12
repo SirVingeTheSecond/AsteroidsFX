@@ -7,7 +7,7 @@ module RenderSystem {
     provides dk.sdu.mmmi.cbse.common.services.IRenderSystem
             with dk.sdu.mmmi.cbse.rendersystem.DefaultRenderSystem;
 
-    provides dk.sdu.mmmi.cbse.common.services.IPluginLifecycle
+    provides dk.sdu.mmmi.cbse.common.services.IGamePluginService
             with dk.sdu.mmmi.cbse.rendersystem.RenderPlugin;
 
     provides dk.sdu.mmmi.cbse.common.services.IDebugService

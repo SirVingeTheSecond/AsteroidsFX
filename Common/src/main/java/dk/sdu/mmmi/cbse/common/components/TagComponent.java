@@ -1,15 +1,14 @@
 package dk.sdu.mmmi.cbse.common.components;
 
 import dk.sdu.mmmi.cbse.common.data.EntityType;
-
 import java.util.EnumSet;
 import java.util.Set;
 
 /**
  * Component that stores entity types for identification and categorization.
- * Uses enum-based approach for type safety and better IDE support.
+ * Uses enum-based approach for type safety.
  */
-public class TagComponent implements Component {
+public class TagComponent implements IComponent {
     private final EnumSet<EntityType> types;
 
     /**

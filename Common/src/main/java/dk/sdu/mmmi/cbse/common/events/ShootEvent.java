@@ -7,7 +7,7 @@ import dk.sdu.mmmi.cbse.common.data.Entity;
  * This event should be handled by a dedicated ShootSystem.
  */
 public class ShootEvent extends BaseGameEvent {
-    private float direction; // Optional direction override
+    private float direction; // Direction override
     private boolean hasDirectionOverride;
 
     /**

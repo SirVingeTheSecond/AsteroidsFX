@@ -1,11 +1,11 @@
 package dk.sdu.mmmi.cbse.bulletsystem;
 
-import dk.sdu.mmmi.cbse.common.components.Component;;
+import dk.sdu.mmmi.cbse.common.components.IComponent;
 
 /**
  * Component that contains bullet-specific properties.
  */
-public class BulletComponent implements Component {
+public class BulletComponent implements IComponent {
     private String shooterID; // ID of the entity that fired this bullet
     private BulletType type;
     private float speed;

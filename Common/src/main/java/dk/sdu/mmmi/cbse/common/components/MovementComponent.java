@@ -4,7 +4,7 @@ package dk.sdu.mmmi.cbse.common.components;
  * Generic movement component for any entity that needs movement behavior.
  * Can be used by asteroids, enemies, players, or any other moving entity.
  */
-public class MovementComponent implements Component {
+public class MovementComponent implements IComponent {
     private float speed;
     private float rotationSpeed;
     private float accelerationSpeed;

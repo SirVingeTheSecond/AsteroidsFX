@@ -2,12 +2,11 @@ module Collision {
     requires Common;
     requires CommonCollision;
     requires javafx.graphics;
+    requires java.logging;
 
     uses dk.sdu.mmmi.cbse.common.services.IGameEventService;
-    uses dk.sdu.mmmi.cbse.common.services.ICollisionService;
 
     exports dk.sdu.mmmi.cbse.collisionsystem;
-    exports dk.sdu.mmmi.cbse.collisionsystem.collision;
 
     provides dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService
             with dk.sdu.mmmi.cbse.collisionsystem.CollisionSystem;
@@ -18,6 +17,6 @@ module Collision {
     provides dk.sdu.mmmi.cbse.common.services.ICollisionService
             with dk.sdu.mmmi.cbse.collisionsystem.CollisionSystem;
 
-    provides dk.sdu.mmmi.cbse.common.services.IPluginLifecycle
+    provides dk.sdu.mmmi.cbse.common.services.IGamePluginService
             with dk.sdu.mmmi.cbse.collisionsystem.CollisionPlugin;
 }

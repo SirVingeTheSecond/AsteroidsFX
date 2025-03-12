@@ -15,8 +15,8 @@ class ModuleConfig {
     }
 
     @Bean
-    public Game game() {
-        return new Game(
+    public GameLoop game() {
+        return new GameLoop(
                 pluginLifecycles(),
                 entityProcessors(),
                 postProcessors(),
