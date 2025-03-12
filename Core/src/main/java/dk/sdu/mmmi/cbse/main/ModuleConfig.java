@@ -1,45 +1,71 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dk.sdu.mmmi.cbse.main;
 
-import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
-import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
-import dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService;
-import java.util.List;
-import java.util.ServiceLoader;
-import static java.util.stream.Collectors.toList;
+import dk.sdu.mmmi.cbse.common.services.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- *
- * @author jcs
- */
+import java.util.List;
+import java.util.ServiceLoader;
+import static java.util.stream.Collectors.toList;
+
 @Configuration
 class ModuleConfig {
-    
+
     public ModuleConfig() {
     }
 
     @Bean
-    public Game game(){
-        return new Game(gamePluginServices(), entityProcessingServiceList(), postEntityProcessingServices());
+    public Game game() {
+        return new Game(
+                pluginLifecycles(),
+                entityProcessors(),
+                postProcessors(),
+                gameEventService()
+        );
     }
 
     @Bean
-    public List<IEntityProcessingService> entityProcessingServiceList(){
-        return ServiceLoader.load(IEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+    public List<IPluginLifecycle> pluginLifecycles() {
+        List<IPluginLifecycle> plugins = ServiceLoader.load(IPluginLifecycle.class)
+                .stream()
+                .map(ServiceLoader.Provider::get)
+                .collect(toList());
+
+        System.out.println("Loaded " + plugins.size() + " plugins:");
+        for (IPluginLifecycle plugin : plugins) {
+            System.out.println(" - " + plugin.getClass().getName());
+        }
+
+        return plugins;
     }
 
     @Bean
-    public List<IGamePluginService> gamePluginServices() {
-        return ServiceLoader.load(IGamePluginService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+    public List<IEntityProcessingService> entityProcessors() {
+        List<IEntityProcessingService> processors = ServiceLoader.load(IEntityProcessingService.class)
+                .stream()
+                .map(ServiceLoader.Provider::get)
+                .collect(toList());
+
+        System.out.println("Loaded " + processors.size() + " entity processors:");
+        for (IEntityProcessingService processor : processors) {
+            System.out.println(" - " + processor.getClass().getName());
+        }
+
+        return processors;
     }
 
     @Bean
-    public List<IPostEntityProcessingService> postEntityProcessingServices() {
-        return ServiceLoader.load(IPostEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
+    public List<IPostEntityProcessingService> postProcessors() {
+        return ServiceLoader.load(IPostEntityProcessingService.class)
+                .stream()
+                .map(ServiceLoader.Provider::get)
+                .collect(toList());
+    }
+
+    @Bean
+    public IGameEventService gameEventService() {
+        return ServiceLoader.load(IGameEventService.class)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No IGameEventService implementation found"));
     }
 }

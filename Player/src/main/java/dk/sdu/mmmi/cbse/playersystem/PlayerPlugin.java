@@ -4,35 +4,34 @@ import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
-public class PlayerPlugin implements IGamePluginService {
+import dk.sdu.mmmi.cbse.common.services.IGameEventService;
 
+import java.util.ServiceLoader;
+
+public class PlayerPlugin implements IGamePluginService, IPluginLifecycle {
     private Entity player;
+    private final PlayerFactory playerFactory;
 
     public PlayerPlugin() {
+        IGameEventService eventService = ServiceLoader.load(IGameEventService.class)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No IGameEventService implementation found"));
+
+        this.playerFactory = new PlayerFactory(eventService);
     }
 
     @Override
     public void start(GameData gameData, World world) {
-
-        // Add entities to the world
-        player = createPlayerShip(gameData);
+        // Create a player entity
+        player = playerFactory.createEntity(gameData);
         world.addEntity(player);
-    }
 
-    private Entity createPlayerShip(GameData gameData) {
-
-        Entity playerShip = new Player();
-        playerShip.setPolygonCoordinates(-5,-5,10,0,-5,5);
-        playerShip.setX(gameData.getDisplayHeight()/2);
-        playerShip.setY(gameData.getDisplayWidth()/2);
-        playerShip.setRadius(8);
-        return playerShip;
+        System.out.println("Player created with ID: " + player.getID());
     }
 
     @Override
     public void stop(GameData gameData, World world) {
-        // Remove entities
+        // Remove the player
         world.removeEntity(player);
     }
-
 }

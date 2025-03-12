@@ -4,48 +4,35 @@ import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
 
 /**
- * Interface for game plugins that can be dynamically loaded/unloaded.
- * Handles the lifecycle of game components.
+ * Plugin lifecycle management interface.
+ * Ensures proper component initialization and cleanup.
  */
 public interface IGamePluginService {
     /**
-     * Starts the plugin and initializes its resources.
+     * Initialize plugin and its resources.
      *
-     * Pre-conditions:
-     * - gameData must not be null
-     * - world must not be null
-     * - Plugin must not already be started
+     * @pre gameData != null
+     * @pre world != null
+     * @pre Plugin not already started
+     * @post All plugin resources initialized
+     * @post Required entities added to world
      *
-     * Post-conditions:
-     * - All plugin resources must be properly initialized
-     * - Required entities must be created and added to world
-     * - Plugin must be in a ready state
-     *
-     * @param gameData Contains game state and configuration
-     * @param world Contains all game entities
-     * @throws NullPointerException if gameData or world is null
-     * @throws IllegalStateException if plugin is already started
+     * @param gameData Current game state
+     * @param world Game world to populate
      */
     void start(GameData gameData, World world);
 
     /**
-     * Stops the plugin and cleans up its resources.
+     * Clean up plugin resources.
      *
-     * Pre-conditions:
-     * - gameData must not be null
-     * - world must not be null
-     * - Plugin must be in started state
+     * @pre gameData != null
+     * @pre world != null
+     * @pre Plugin in started state
+     * @post All plugin resources released
+     * @post Plugin entities removed from world
      *
-     * Post-conditions:
-     * - All plugin resources must be properly released
-     * - Plugin entities must be removed from world
-     * - Plugin must be in a stopped state
-     * - No memory leaks should occur
-     *
-     * @param gameData Contains game state and configuration
-     * @param world Contains all game entities
-     * @throws NullPointerException if gameData or world is null
-     * @throws IllegalStateException if plugin is not started
+     * @param gameData Current game state
+     * @param world Game world to clean up
      */
     void stop(GameData gameData, World world);
 }
