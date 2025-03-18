@@ -14,7 +14,8 @@ import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.util.EntityBuilder;
 
 /**
- * Factory for creating bullet entities using the EntityBuilder pattern.
+ * Factory for creating bullet entities.
+ * Implements the BulletSPI for bullet creation.
  */
 public class BulletFactory implements BulletSPI {
 
@@ -37,7 +38,7 @@ public class BulletFactory implements BulletSPI {
         // Determine bullet properties based on shooter type
         boolean isPlayerBullet = shooterTag != null && shooterTag.hasType(EntityType.PLAYER);
 
-        // Create bullet component with appropriate properties
+        // Create bullet component
         BulletComponent bulletComponent = new BulletComponent();
         bulletComponent.setType(isPlayerBullet ? BulletComponent.BulletType.PLAYER : BulletComponent.BulletType.ENEMY);
         bulletComponent.setShooterID(shooter.getID());

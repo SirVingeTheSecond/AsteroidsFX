@@ -1,5 +1,6 @@
 package dk.sdu.mmmi.cbse.bulletsystem;
 
+import dk.sdu.mmmi.cbse.common.Time;
 import dk.sdu.mmmi.cbse.common.Vector2D;
 import dk.sdu.mmmi.cbse.common.bullet.BulletSPI;
 import dk.sdu.mmmi.cbse.common.components.TagComponent;
@@ -13,14 +14,13 @@ import dk.sdu.mmmi.cbse.common.events.ShootEvent;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 import dk.sdu.mmmi.cbse.common.services.IGameEventService;
 import dk.sdu.mmmi.cbse.common.util.ServiceLocator;
-import dk.sdu.mmmi.cbse.main.Time;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * System that handles bullet creation, movement, and lifecycle.
- * SHOULD BE SPLIT INTO CREATION, MOVEMENT AND LIFECYCLE!
+ * System that processes bullets.
+ * Handles bullet movement, lifetime, and creation from shoot events.
  */
 public class BulletSystem implements IEntityProcessingService, IGameEventListener<ShootEvent> {
     private final BulletSPI bulletSPI;
@@ -28,6 +28,9 @@ public class BulletSystem implements IEntityProcessingService, IGameEventListene
     private World world;
     private GameData gameData;
 
+    /**
+     * Create a new bullet system
+     */
     public BulletSystem() {
         // Get required services
         this.bulletSPI = ServiceLocator.getService(BulletSPI.class);
@@ -48,11 +51,13 @@ public class BulletSystem implements IEntityProcessingService, IGameEventListene
 
         // Process all bullet entities
         for (Entity entity : world.getEntities()) {
+            // Skip if not a bullet
             TagComponent tagComponent = entity.getComponent(TagComponent.class);
             if (tagComponent == null || !tagComponent.hasType(EntityType.BULLET)) {
                 continue;
             }
 
+            // Get required components
             BulletComponent bulletComponent = entity.getComponent(BulletComponent.class);
             TransformComponent transform = entity.getComponent(TransformComponent.class);
 
@@ -65,7 +70,7 @@ public class BulletSystem implements IEntityProcessingService, IGameEventListene
             Vector2D velocity = forward.scale(bulletComponent.getSpeed() * deltaTime);
             transform.translate(velocity);
 
-            // Handle bullet lifetime - reduce by deltaTime
+            // Handle bullet lifetime
             bulletComponent.setRemainingLifetime(bulletComponent.getRemainingLifetime() - 1);
 
             // Remove bullets that are either expired or out of bounds
@@ -78,6 +83,9 @@ public class BulletSystem implements IEntityProcessingService, IGameEventListene
         bulletsToRemove.forEach(world::removeEntity);
     }
 
+    /**
+     * Check if bullet is out of the game area
+     */
     private boolean isOutOfBounds(TransformComponent transform, GameData gameData) {
         float x = transform.getX();
         float y = transform.getY();

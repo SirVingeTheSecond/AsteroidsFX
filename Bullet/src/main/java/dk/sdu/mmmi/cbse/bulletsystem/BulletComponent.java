@@ -3,7 +3,8 @@ package dk.sdu.mmmi.cbse.bulletsystem;
 import dk.sdu.mmmi.cbse.common.components.IComponent;
 
 /**
- * Component that contains bullet-specific properties.
+ * Component for bullet-specific properties.
+ * Contains information about shooter, damage, speed, etc.
  */
 public class BulletComponent implements IComponent {
     private String shooterID; // ID of the entity that fired this bullet
@@ -13,11 +14,17 @@ public class BulletComponent implements IComponent {
     private int lifetime;
     private float damage;
 
+    /**
+     * Types of bullets for different sources
+     */
     public enum BulletType {
-        PLAYER,
-        ENEMY
+        PLAYER,  // Fired by player
+        ENEMY    // Fired by enemies
     }
 
+    /**
+     * Create a new bullet component with default values
+     */
     public BulletComponent() {
         this.speed = 2.0f;
         this.lifetime = 600; // 10 seconds at 60 FPS
@@ -26,6 +33,7 @@ public class BulletComponent implements IComponent {
         this.type = BulletType.PLAYER; // Default
     }
 
+    // Getters and setters
     public void setType(BulletType type) {
         this.type = type;
     }
@@ -75,6 +83,9 @@ public class BulletComponent implements IComponent {
         this.remainingLifetime = lifetime;
     }
 
+    /**
+     * Reduce remaining lifetime by one frame
+     */
     public void reduceLifetime() {
         remainingLifetime--;
     }

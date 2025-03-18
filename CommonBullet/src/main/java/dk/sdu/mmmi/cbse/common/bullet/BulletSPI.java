@@ -4,15 +4,16 @@ import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 
 /**
- * Interface for bullet creation.
+ * Service Provider Interface for bullet creation.
+ * Allows bullet creation to be implemented by different modules.
  */
 public interface BulletSPI {
     /**
-     * Creates a new bullet entity.
+     * Create a new bullet entity
      *
-     * @param e The entity creating the bullet (shooter)
-     * @param gameData Contains game state and configuration
-     * @return A new bullet entity
+     * @param shooter The entity that is shooting
+     * @param gameData Current game state
+     * @return New bullet entity
      */
-    Entity createBullet(Entity e, GameData gameData);
+    Entity createBullet(Entity shooter, GameData gameData);
 }
