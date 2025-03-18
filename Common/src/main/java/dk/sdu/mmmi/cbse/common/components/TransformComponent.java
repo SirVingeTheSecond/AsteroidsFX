@@ -3,7 +3,7 @@ package dk.sdu.mmmi.cbse.common.components;
 import dk.sdu.mmmi.cbse.common.Vector2D;
 
 /**
- * Component that handles entity position, rotation, and shape information.
+ * Component that handles entity position, rotation, and shape.
  * Uses Vector2D for positions and implements Unity-like transform behavior.
  */
 public class TransformComponent implements IComponent {
@@ -15,6 +15,9 @@ public class TransformComponent implements IComponent {
     private Vector2D forward; // Calculated based on rotation
     private Vector2D right; // Perpendicular to forward
 
+    /**
+     * Create a new transform at position (0,0) with scale (1,1)
+     */
     public TransformComponent() {
         this.position = new Vector2D(0, 0);
         this.scale = new Vector2D(1, 1);
@@ -115,7 +118,7 @@ public class TransformComponent implements IComponent {
     }
 
     /**
-     * Unity-like method to move forward based on current rotation
+     * Move forward based on current rotation
      * @param amount Amount to move
      */
     public void moveForward(float amount) {
@@ -123,7 +126,7 @@ public class TransformComponent implements IComponent {
     }
 
     /**
-     * Unity-like method to move right based on current rotation
+     * Move right based on current rotation
      * @param amount Amount to move
      */
     public void moveRight(float amount) {

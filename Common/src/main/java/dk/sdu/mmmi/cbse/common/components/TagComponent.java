@@ -5,21 +5,21 @@ import java.util.EnumSet;
 import java.util.Set;
 
 /**
- * Component that stores entity types for identification and categorization.
+ * Component that stores entity types for categorization.
  * Uses enum-based approach for type safety.
  */
 public class TagComponent implements IComponent {
     private final EnumSet<EntityType> types;
 
     /**
-     * Create a TagComponent with no initial types.
+     * Create a TagComponent with no initial types
      */
     public TagComponent() {
         this.types = EnumSet.noneOf(EntityType.class);
     }
 
     /**
-     * Create a TagComponent with initial entity types.
+     * Create a TagComponent with initial entity types
      * @param initialTypes Initial entity types to add
      */
     public TagComponent(EntityType... initialTypes) {
@@ -32,7 +32,7 @@ public class TagComponent implements IComponent {
     }
 
     /**
-     * Add an entity type to this entity.
+     * Add an entity type to this entity
      * @param type EntityType to add
      */
     public void addType(EntityType type) {
@@ -42,7 +42,7 @@ public class TagComponent implements IComponent {
     }
 
     /**
-     * Remove an entity type from this entity.
+     * Remove an entity type from this entity
      * @param type EntityType to remove
      */
     public void removeType(EntityType type) {
@@ -52,18 +52,18 @@ public class TagComponent implements IComponent {
     }
 
     /**
-     * Check if entity has a specific entity type.
+     * Check if entity has a specific type
      * @param type EntityType to check
-     * @return true if entity has the type, false otherwise
+     * @return true if entity has the type
      */
     public boolean hasType(EntityType type) {
         return type != null && types.contains(type);
     }
 
     /**
-     * Check if entity has all the specified types.
+     * Check if entity has all the specified types
      * @param typeList Types to check
-     * @return true if entity has all types, false otherwise
+     * @return true if entity has all types
      */
     public boolean hasAllTypes(EntityType... typeList) {
         if (typeList == null) {
@@ -79,9 +79,9 @@ public class TagComponent implements IComponent {
     }
 
     /**
-     * Check if entity has any of the specified types.
+     * Check if entity has any of the specified types
      * @param typeList Types to check
-     * @return true if entity has at least one type, false otherwise
+     * @return true if entity has at least one type
      */
     public boolean hasAnyType(EntityType... typeList) {
         if (typeList == null) {
@@ -97,7 +97,7 @@ public class TagComponent implements IComponent {
     }
 
     /**
-     * Get all entity types for this entity.
+     * Get all entity types for this entity
      * @return Unmodifiable set of types
      */
     public Set<EntityType> getTypes() {
@@ -105,7 +105,7 @@ public class TagComponent implements IComponent {
     }
 
     /**
-     * Clear all types from this entity.
+     * Clear all types from this entity
      */
     public void clearTypes() {
         types.clear();
