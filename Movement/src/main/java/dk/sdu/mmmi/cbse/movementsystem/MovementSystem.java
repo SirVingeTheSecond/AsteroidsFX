@@ -1,5 +1,6 @@
 package dk.sdu.mmmi.cbse.movementsystem;
 
+import dk.sdu.mmmi.cbse.common.Time;
 import dk.sdu.mmmi.cbse.common.Vector2D;
 import dk.sdu.mmmi.cbse.common.components.MovementComponent;
 import dk.sdu.mmmi.cbse.common.components.TagComponent;
@@ -9,13 +10,12 @@ import dk.sdu.mmmi.cbse.common.data.EntityType;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
-import dk.sdu.mmmi.cbse.main.Time;
 
 import java.util.Random;
 
 /**
- * System that handles movement for all entities with movement components.
- * Uses Vector2D for positions and Time for framerate-independent movement.
+ * System that handles movement for all entities.
+ * Uses component filtering to process only relevant entities.
  */
 public class MovementSystem implements IEntityProcessingService {
     private final Random random = new Random();
@@ -27,8 +27,7 @@ public class MovementSystem implements IEntityProcessingService {
 
         for (Entity entity : world.getEntities()) {
             // Skip entities without required components
-            if (!entity.hasComponent(TransformComponent.class) ||
-                    !entity.hasComponent(MovementComponent.class)) {
+            if (!hasRequiredComponents(entity)) {
                 continue;
             }
 
@@ -50,7 +49,7 @@ public class MovementSystem implements IEntityProcessingService {
                     processRandomMovement(transform, movement, deltaTime);
                     break;
                 case HOMING:
-                    // Homing movement is handled by some AI system that needs to be implemented
+                    // Homing movement is handled by AI systems that set rotation directly
                     // Just apply linear movement based on current rotation
                     processLinearMovement(transform, movement, deltaTime);
                     break;
@@ -66,6 +65,17 @@ public class MovementSystem implements IEntityProcessingService {
         }
     }
 
+    /**
+     * Check if entity has required components for movement
+     */
+    private boolean hasRequiredComponents(Entity entity) {
+        return entity.hasComponent(TransformComponent.class) &&
+                entity.hasComponent(MovementComponent.class);
+    }
+
+    /**
+     * Process linear movement pattern
+     */
     private void processLinearMovement(TransformComponent transform, MovementComponent movement, float deltaTime) {
         if (movement.getSpeed() <= 0) {
             return; // No movement
@@ -81,6 +91,9 @@ public class MovementSystem implements IEntityProcessingService {
         transform.translate(velocity);
     }
 
+    /**
+     * Process random movement pattern
+     */
     private void processRandomMovement(TransformComponent transform, MovementComponent movement, float deltaTime) {
         // Check if it's time to change direction
         long lastChange = movement.getLastDirectionChange();

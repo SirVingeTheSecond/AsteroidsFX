@@ -8,8 +8,8 @@ import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService;
 
 /**
- * System that handles screen wrapping for all entities with transform components.
- * This is a post-processing system that runs after all entity movement is complete.
+ * System that wraps entities around screen edges.
+ * Runs as a post-processor after movement is applied.
  */
 public class ScreenWrapSystem implements IPostEntityProcessingService {
 
@@ -26,6 +26,9 @@ public class ScreenWrapSystem implements IPostEntityProcessingService {
         }
     }
 
+    /**
+     * Wrap entity position if it goes off-screen
+     */
     private void handleScreenWrap(TransformComponent transform, GameData gameData) {
         float x = transform.getX();
         float y = transform.getY();

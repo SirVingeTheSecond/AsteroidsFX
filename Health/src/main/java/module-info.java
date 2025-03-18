@@ -1,4 +1,3 @@
 module Health {
     requires Common;
-
 }

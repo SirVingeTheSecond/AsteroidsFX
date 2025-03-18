@@ -23,7 +23,7 @@
         <module>Movement</module>
         <module>CommonCollision</module>
         <module>CommonEnemy</module>
-        <module>RenderSystem</module>
+        <module>Renderer</module>
         <module>Health</module>
     </modules>
     <properties>
