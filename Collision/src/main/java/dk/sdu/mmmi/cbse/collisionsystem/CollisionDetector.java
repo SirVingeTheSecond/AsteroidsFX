@@ -1,17 +1,17 @@
 package dk.sdu.mmmi.cbse.collisionsystem;
 
-import dk.sdu.mmmi.cbse.common.Vector2D;
 import dk.sdu.mmmi.cbse.common.collision.CollisionComponent;
 import dk.sdu.mmmi.cbse.common.collision.CollisionPair;
+import dk.sdu.mmmi.cbse.common.components.TagComponent;
 import dk.sdu.mmmi.cbse.common.components.TransformComponent;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.EntityType;
-import dk.sdu.mmmi.cbse.common.components.TagComponent;
 
 import java.util.*;
 
 /**
- * Collision detection system that uses spatial partitioning.
+ * Collision detection system with spatial partitioning.
+ * Provides efficient collision detection for large numbers of entities.
  */
 public class CollisionDetector {
     private static final int CELL_SIZE = 64; // Size of each grid cell
@@ -142,7 +142,6 @@ public class CollisionDetector {
 
     /**
      * Detect collisions by processing entity types in a specific order
-     * to minimize unnecessary checks
      *
      * @param collisions Set to add collisions to
      * @param processedPairs Set of already processed pairs
@@ -285,10 +284,10 @@ public class CollisionDetector {
             return false;
         }
 
-        // Use Vector2D for distance calculation
-        Vector2D pos1 = transform1.getPosition();
-        Vector2D pos2 = transform2.getPosition();
-        float distance = pos1.distance(pos2);
+        // Simple circle collision detection
+        float dx = transform1.getX() - transform2.getX();
+        float dy = transform1.getY() - transform2.getY();
+        float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
         return distance < (transform1.getRadius() + transform2.getRadius());
     }
@@ -332,8 +331,6 @@ public class CollisionDetector {
      */
     private int getGridKey(int x, int y) {
         // Using Szudzik's function (a space-filling curve) for better distribution
-        // Source: http://szudzik.com/ElegantPairing.pdf ; https://www.vertexfragment.com/ramblings/cantor-szudzik-pairing-functions/
-        // Java: https://stackoverflow.com/questions/53802655/how-to-write-szudziks-function-in-java
         return x >= 0 ? (x * x + x + y) : (y * y + x);
     }
 

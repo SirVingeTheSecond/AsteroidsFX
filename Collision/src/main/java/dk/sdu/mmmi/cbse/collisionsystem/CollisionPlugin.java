@@ -5,17 +5,19 @@ import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 
 /**
- * Plugin for the Collision module - handles startup and shutdown
+ * Plugin for collision system.
+ * Manages collision system lifecycle.
  */
 public class CollisionPlugin implements IGamePluginService {
 
     @Override
     public void start(GameData gameData, World world) {
-        // Initialize collision resources if needed
+        // System is instantiated through ServiceLoader
+        // Nothing to do here
     }
 
     @Override
     public void stop(GameData gameData, World world) {
-        // Clean up collision resources if needed
+        // Nothing to clean up
     }
 }

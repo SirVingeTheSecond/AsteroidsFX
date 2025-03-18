@@ -15,30 +15,31 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * System that handles collision detection and resolution.
- * Implements separation of concerns between detection and resolution.
+ * System for collision detection and resolution.
+ * Implements the ICollisionService interface.
  */
 public class CollisionSystem implements IPostEntityProcessingService, ICollisionService {
     private static final Logger LOGGER = Logger.getLogger(CollisionSystem.class.getName());
 
     private final CollisionDetector detector;
     private final CollisionResolver resolver;
-    private final IGameEventService eventService;
-
     private boolean debugEnabled = false;
 
+    /**
+     * Create a new collision system
+     */
     public CollisionSystem() {
-        // Load required services
-        this.eventService = ServiceLocator.getService(IGameEventService.class);
-
         // Initialize collision components
         this.detector = new CollisionDetector();
+
+        // Load required services
+        IGameEventService eventService = ServiceLocator.getService(IGameEventService.class);
         this.resolver = new CollisionResolver(eventService);
     }
 
     @Override
     public void process(GameData gameData, World world) {
-        long startTime = System.nanoTime(); // Just call getTime?
+        long startTime = System.nanoTime();
 
         // Clear the detector for this frame
         detector.clear();
@@ -57,7 +58,7 @@ public class CollisionSystem implements IPostEntityProcessingService, ICollision
         // Resolve the collisions
         resolver.resolveCollisions(collisions, world);
 
-        long endTime = System.nanoTime(); // Just call getTime?
+        long endTime = System.nanoTime();
 
         if (debugEnabled) {
             LOGGER.log(Level.INFO,

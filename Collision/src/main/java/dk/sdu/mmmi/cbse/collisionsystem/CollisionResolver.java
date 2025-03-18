@@ -14,12 +14,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Handles resolving collisions between entities based on their collision components.
+ * Collision resolution system.
+ * Handles what happens when entities collide.
  */
 public class CollisionResolver {
     private static final Logger LOGGER = Logger.getLogger(CollisionResolver.class.getName());
     private final IGameEventService eventService;
 
+    /**
+     * Create a new collision resolver
+     * @param eventService Event service for publishing collision events
+     */
     public CollisionResolver(IGameEventService eventService) {
         this.eventService = eventService;
     }
@@ -88,8 +93,7 @@ public class CollisionResolver {
     }
 
     /**
-     * Check if the collision groups between entities are compatible.
-     * This is probably not the most efficient way to do it.
+     * Check if the collision groups between entities are compatible
      *
      * @param entityA First entity
      * @param entityB Second entity
