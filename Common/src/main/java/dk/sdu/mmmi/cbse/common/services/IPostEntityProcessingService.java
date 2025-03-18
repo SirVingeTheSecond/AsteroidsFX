@@ -4,21 +4,15 @@ import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
 
 /**
- * Post-processing interface for operations after main game logic.
- * Handles collision detection, cleanup, etc.
+ * Interface for systems that run after entity processing.
+ * Used for collision detection, cleanup, etc.
  */
 public interface IPostEntityProcessingService {
     /**
-     * Perform post-processing operations.
-     *
-     * @pre gameData != null
-     * @pre world != null
-     * @pre All entity processing complete
-     * @post Post-processing effects applied
-     * @post World state remains valid
+     * Process operations after main entity processing
      *
      * @param gameData Current game state
-     * @param world Game world to process
+     * @param world Game world containing entities
      */
     void process(GameData gameData, World world);
 }

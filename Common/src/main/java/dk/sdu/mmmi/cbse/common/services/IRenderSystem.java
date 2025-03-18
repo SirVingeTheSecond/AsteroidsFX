@@ -5,16 +5,11 @@ import dk.sdu.mmmi.cbse.common.data.World;
 import javafx.scene.canvas.GraphicsContext;
 
 /**
- * Interface for rendering game elements.
+ * Interface for systems that render game elements.
  */
 public interface IRenderSystem {
     /**
-     * Render all visible game elements.
-     *
-     * @pre gc != null
-     * @pre gameData != null
-     * @pre world != null
-     * @post Game entities are rendered to the provided GraphicsContext
+     * Render game elements to the graphics context
      *
      * @param gc Graphics context to render to
      * @param gameData Current game state

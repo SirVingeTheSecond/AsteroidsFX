@@ -1,30 +1,37 @@
 package dk.sdu.mmmi.cbse.common.components;
 
 /**
- * Generic movement component for any entity that needs movement behavior.
- * Can be used by asteroids, enemies, players, or any other moving entity.
+ * Component for entity movement behavior.
+ * Defines movement patterns and properties.
  */
 public class MovementComponent implements IComponent {
+    // Movement properties
     private float speed;
     private float rotationSpeed;
     private float accelerationSpeed;
     private boolean isAccelerating;
     private long lastDirectionChange;
 
-    // Movement type to define different movement patterns
+    /**
+     * Movement patterns for different entity behaviors
+     */
     public enum MovementPattern {
-        LINEAR,      // Straight line movement
-        RANDOM,      // Random direction changes
-        HOMING,      // Follows a target
-        PLAYER       // Responds to player input
+        LINEAR,  // Straight line movement
+        RANDOM,  // Random direction changes
+        HOMING,  // Follows a target
+        PLAYER   // Responds to player input
     }
 
     private MovementPattern pattern;
 
+    /**
+     * Create a new movement component with LINEAR pattern
+     */
     public MovementComponent() {
         this.pattern = MovementPattern.LINEAR;
     }
 
+    // Getters and setters
     public float getSpeed() {
         return speed;
     }

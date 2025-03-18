@@ -4,18 +4,12 @@ import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
 
 /**
- * Plugin lifecycle management interface.
- * Ensures proper component initialization and cleanup.
+ * Interface for plugin lifecycle management.
+ * Handles loading and unloading of game features.
  */
 public interface IGamePluginService {
     /**
-     * Initialize plugin and its resources.
-     *
-     * @pre gameData != null
-     * @pre world != null
-     * @pre Plugin not already started
-     * @post All plugin resources initialized
-     * @post Required entities added to world
+     * Start the plugin and initialize resources
      *
      * @param gameData Current game state
      * @param world Game world to populate
@@ -23,13 +17,7 @@ public interface IGamePluginService {
     void start(GameData gameData, World world);
 
     /**
-     * Clean up plugin resources.
-     *
-     * @pre gameData != null
-     * @pre world != null
-     * @pre Plugin in started state
-     * @post All plugin resources released
-     * @post Plugin entities removed from world
+     * Stop the plugin and clean up resources
      *
      * @param gameData Current game state
      * @param world Game world to clean up

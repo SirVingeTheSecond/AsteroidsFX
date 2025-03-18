@@ -1,7 +1,8 @@
 package dk.sdu.mmmi.cbse.common.components;
 
 /**
- * Component that handles shooting-related data for entities.
+ * Component for entities that can shoot.
+ * Handles cooldown, projectile properties, etc.
  */
 public class ShootingComponent implements IComponent {
     private int cooldownMax;
@@ -11,6 +12,9 @@ public class ShootingComponent implements IComponent {
     private float damage;
     private int projectileLifetime;
 
+    /**
+     * Create a new shooting component with default values
+     */
     public ShootingComponent() {
         this.cooldownMax = 20; // Default 20 frames between shots
         this.cooldownRemaining = 0;
@@ -20,6 +24,7 @@ public class ShootingComponent implements IComponent {
         this.projectileLifetime = 60;
     }
 
+    // Getters and setters
     public int getCooldownMax() { return cooldownMax; }
     public void setCooldownMax(int cooldownMax) { this.cooldownMax = cooldownMax; }
 
@@ -39,7 +44,7 @@ public class ShootingComponent implements IComponent {
     public void setProjectileLifetime(int projectileLifetime) { this.projectileLifetime = projectileLifetime; }
 
     /**
-     * Update the cooldown timer.
+     * Update the cooldown timer
      */
     public void updateCooldown() {
         if (cooldownRemaining > 0) {
@@ -51,7 +56,7 @@ public class ShootingComponent implements IComponent {
     }
 
     /**
-     * Reset the cooldown timer after shooting.
+     * Reset the cooldown timer after shooting
      */
     public void resetCooldown() {
         cooldownRemaining = cooldownMax;
