@@ -1,5 +1,6 @@
 package dk.sdu.mmmi.cbse.main;
 
+import dk.sdu.mmmi.cbse.common.Time;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.input.Input;
@@ -7,15 +8,14 @@ import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 import dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService;
 import dk.sdu.mmmi.cbse.common.services.IGameEventService;
 import dk.sdu.mmmi.cbse.common.services.IRenderSystem;
-import dk.sdu.sem.gamesystem.Time;
 import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.GraphicsContext;
 
 import java.util.List;
 
 /**
- * Game loop implementation with Unity-like Time management.
- * Supports both variable timestep for rendering and fixed timestep for physics.
+ * Standardized game loop implementation.
+ * Provides both variable and fixed timestep updates.
  */
 public class GameLoop extends AnimationTimer {
     private final GameData gameData;
@@ -89,10 +89,8 @@ public class GameLoop extends AnimationTimer {
         // Process game events
         eventService.process();
 
-        // Process all entities that don't need fixed timestep
+        // Process all entities
         for (IEntityProcessingService processor : entityProcessors) {
-            // Skip physics processors here if they are marked for fixed update
-            // This would require extending IEntityProcessingService with a isFixedUpdate() method
             processor.process(gameData, world);
         }
 
@@ -107,13 +105,10 @@ public class GameLoop extends AnimationTimer {
     }
 
     /**
-     * Fixed timestep update for physics and other deterministic systems
+     * Fixed timestep update for physics and deterministic systems
      */
     private void fixedUpdate() {
         Time.fixedUpdate();
-
-        // Process fixed update systems
-        // Here you would only process systems that need fixed timestep (like physics)
 
         // Process post-processing (usually collision)
         for (IPostEntityProcessingService postProcessor : postProcessors) {
