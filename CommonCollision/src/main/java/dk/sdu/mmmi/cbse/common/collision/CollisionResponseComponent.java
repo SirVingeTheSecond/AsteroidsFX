@@ -8,20 +8,38 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Component that handles collision responses
+ * Component that handles collision responses.
+ * Allows defining different responses for collision layers and groups.
  */
 public class CollisionResponseComponent implements IComponent {
     private final Map<CollisionLayer, CollisionResponseHandler> layerResponses = new HashMap<>();
     private final Map<CollisionGroup, CollisionResponseHandler> groupResponses = new HashMap<>();
 
+    /**
+     * Add a response handler for a specific layer
+     * @param layer The collision layer to handle
+     * @param handler The response handler
+     */
     public void addLayerResponse(CollisionLayer layer, CollisionResponseHandler handler) {
         layerResponses.put(layer, handler);
     }
 
+    /**
+     * Add a response handler for a specific group
+     * @param group The collision group to handle
+     * @param handler The response handler
+     */
     public void addGroupResponse(CollisionGroup group, CollisionResponseHandler handler) {
         groupResponses.put(group, handler);
     }
 
+    /**
+     * Handle a collision with another entity
+     * @param self This entity
+     * @param other The other entity
+     * @param world The game world
+     * @return true if collision was handled
+     */
     public boolean handleCollision(Entity self, Entity other, World world) {
         CollisionComponent otherCC = other.getComponent(CollisionComponent.class);
         if (otherCC == null || !otherCC.isActive()) {

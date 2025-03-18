@@ -6,27 +6,40 @@ import java.util.Objects;
 
 /**
  * Represents a pair of colliding entities.
- * Provides equality and hashCode that treats the pair as unordered ((A,B) is the same as (B,A)).
+ * Provides equality and hashCode that treats the pair as unordered.
  */
 public class CollisionPair {
     private final Entity entityA;
     private final Entity entityB;
 
+    /**
+     * Create a new collision pair
+     * @param entityA First entity
+     * @param entityB Second entity
+     */
     public CollisionPair(Entity entityA, Entity entityB) {
         this.entityA = entityA;
         this.entityB = entityB;
     }
 
+    /**
+     * Get the first entity in the pair
+     * @return First entity
+     */
     public Entity getEntityA() {
         return entityA;
     }
 
+    /**
+     * Get the second entity in the pair
+     * @return Second entity
+     */
     public Entity getEntityB() {
         return entityB;
     }
 
     /**
-     * Gets the "other" entity given one entity in the pair.
+     * Gets the "other" entity given one entity in the pair
      * @param entity One of the entities in the pair
      * @return The other entity in the pair
      * @throws IllegalArgumentException If the provided entity is not part of this pair
@@ -42,9 +55,9 @@ public class CollisionPair {
     }
 
     /**
-     * Check if an entity is part of this collision pair.
+     * Check if an entity is part of this collision pair
      * @param entity The entity to check
-     * @return true if the entity is part of this collision pair
+     * @return true if the entity is part of this pair
      */
     public boolean contains(Entity entity) {
         return entity.equals(entityA) || entity.equals(entityB);
