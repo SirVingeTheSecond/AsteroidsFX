@@ -6,14 +6,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Service locator utility to centralize service discovery logic and error handling.
- * Provides robust mechanisms for finding service implementations and fallbacks.
+ * Service locator utility to centralize service discovery.
+ * Provides standardized access to services across the application.
  */
 public class ServiceLocator {
     private static final Logger LOGGER = Logger.getLogger(ServiceLocator.class.getName());
 
     /**
-     * Get a service implementation with proper error reporting.
+     * Get a service implementation
      *
      * @param <T> Type of service interface
      * @param serviceClass The service interface class
@@ -25,7 +25,7 @@ public class ServiceLocator {
     }
 
     /**
-     * Get a service implementation with a fallback in case none is found.
+     * Get a service implementation with a fallback
      *
      * @param <T> Type of service interface
      * @param serviceClass The service interface class

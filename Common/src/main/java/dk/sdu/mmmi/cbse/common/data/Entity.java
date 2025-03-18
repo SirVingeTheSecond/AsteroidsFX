@@ -8,8 +8,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Base entity class using composition for components.
- * Provides core entity functionality and component management.
+ * Base entity class for the component-based design.
  * Following ECS principles, entities are just identifiers with components.
  */
 public class Entity implements Serializable {
@@ -18,12 +17,16 @@ public class Entity implements Serializable {
 
     /**
      * Creates a new entity with no components.
-     * Components should be added explicitly by systems based on entity requirements.
+     * Components should be added explicitly by systems.
      */
     public Entity() {
-
+        // Empty constructor
     }
 
+    /**
+     * Get the unique identifier for this entity
+     * @return Unique ID string
+     */
     public String getID() {
         return ID.toString();
     }
@@ -34,7 +37,7 @@ public class Entity implements Serializable {
      * @param <T> Type of component extending Component interface
      */
     public <T extends IComponent> void addComponent(T component) {
-        components.put(component.getClass(), component);
+        components.putIfAbsent(component.getClass(), component);
     }
 
     /**

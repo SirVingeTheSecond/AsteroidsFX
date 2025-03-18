@@ -1,13 +1,13 @@
 package dk.sdu.mmmi.cbse.common.data;
 
 /**
- * Common entity types in the game.
- * Provides type-safe entity categorization for the component system.
+ * Enumeration of all entity types in the game.
+ * Used for type-safe entity categorization.
  */
 public enum EntityType {
-    PLAYER,
-    ENEMY,
-    ASTEROID,
-    BULLET,
-    POWERUP;
+    PLAYER,    // Player ship
+    ENEMY,     // Enemy ships
+    ASTEROID,  // Asteroid objects
+    BULLET,    // Projectiles
+    POWERUP;   // Collectible power-ups
 }

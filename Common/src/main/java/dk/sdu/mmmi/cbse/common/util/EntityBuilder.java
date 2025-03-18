@@ -8,8 +8,8 @@ import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.EntityType;
 
 /**
- * Builder class to standardize entity creation across the game.
- * Uses Vector2D for positions and supports Unity-like transform operations.
+ * Builder utility for standardized entity creation.
+ * Ensures consistent entity construction across the application.
  */
 public class EntityBuilder {
     private final Entity entity;
