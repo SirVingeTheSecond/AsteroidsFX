@@ -5,6 +5,7 @@ module Enemy {
     requires CommonBullet;
     requires CommonCollision;
     requires CommonEnemy;
+    requires javafx.graphics;
 
     uses dk.sdu.mmmi.cbse.common.bullet.BulletSPI;
     uses dk.sdu.mmmi.cbse.common.services.IGameEventService;

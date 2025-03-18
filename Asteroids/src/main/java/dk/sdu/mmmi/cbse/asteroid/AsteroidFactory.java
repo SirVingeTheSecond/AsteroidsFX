@@ -29,13 +29,6 @@ public class AsteroidFactory implements IEntityFactory<Entity> {
         return createAsteroid(gameData, 0, null);
     }
 
-    /**
-     * Create an asteroid with specific parameters
-     * @param gameData Game data for positioning
-     * @param splitCount Current split count (0 for new asteroids)
-     * @param parent Parent asteroid (null for new asteroids)
-     * @return New asteroid entity
-     */
     public Entity createAsteroid(GameData gameData, int splitCount, Entity parent) {
         Entity asteroid = new Entity();
 
@@ -58,15 +51,23 @@ public class AsteroidFactory implements IEntityFactory<Entity> {
             transform.setX(parentTransform.getX() + Math.cos(angle) * offset);
             transform.setY(parentTransform.getY() + Math.sin(angle) * offset);
         } else {
-            // Random starting position (currently spawning at visible positions)
-            transform.setX(100 + random.nextDouble() * (gameData.getDisplayWidth() - 200));  // Keep away from edges
-            transform.setY(100 + random.nextDouble() * (gameData.getDisplayHeight() - 200)); // Keep away from edges
+            // Random starting position
+            transform.setX(100 + random.nextDouble() * (gameData.getDisplayWidth() - 200));
+            transform.setY(100 + random.nextDouble() * (gameData.getDisplayHeight() - 200));
         }
 
         transform.setRadius(size);
         transform.setPolygonCoordinates(generateAsteroidShape(size));
         transform.setRotation(random.nextInt(360));
         asteroid.addComponent(transform);
+
+        // Add renderer component
+        RendererComponent renderer = new RendererComponent();
+        renderer.setStrokeColor(Color.LIGHTGRAY);
+        renderer.setFillColor(Color.color(0.2, 0.2, 0.2, 0.5)); // Dark semi-transparent fill
+        renderer.setStrokeWidth(1.0f);
+        renderer.setRenderLayer(200); // Asteroids in middle layer
+        asteroid.addComponent(renderer);
 
         // Create movement component
         MovementComponent movement = new MovementComponent();

@@ -1,5 +1,7 @@
 package dk.sdu.mmmi.cbse.common.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.logging.Level;
@@ -56,6 +58,25 @@ public class ServiceLocator {
             throw new ServiceNotFoundException("No implementation found for required service: " +
                     serviceClass.getName());
         }
+    }
+
+    /**
+     * Get all implementations of a service
+     *
+     * @param <T> Type of service interface
+     * @param serviceClass The service interface class
+     * @return List of all implementations
+     */
+    public static <T> List<T> locateAll(Class<T> serviceClass) {
+        LOGGER.log(Level.INFO, "Loading all implementations of: {0}", serviceClass.getName());
+
+        List<T> implementations = new ArrayList<>();
+        ServiceLoader.load(serviceClass).forEach(implementations::add);
+
+        LOGGER.log(Level.INFO, "Found {0} implementations of {1}",
+                new Object[] { implementations.size(), serviceClass.getName() });
+
+        return implementations;
     }
 
     /**

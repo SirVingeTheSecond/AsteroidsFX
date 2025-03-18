@@ -3,6 +3,7 @@ module Bullet {
     requires CommonBullet;
     requires CommonCollision;
     requires java.logging;
+    requires javafx.graphics;
 
     uses dk.sdu.mmmi.cbse.common.services.IGameEventService;
     uses dk.sdu.mmmi.cbse.common.bullet.BulletSPI;

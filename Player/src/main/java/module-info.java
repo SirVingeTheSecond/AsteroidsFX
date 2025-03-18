@@ -4,6 +4,7 @@ module Player {
     requires Common;
     requires CommonBullet;
     requires CommonCollision;
+    requires javafx.graphics;
 
     uses dk.sdu.mmmi.cbse.common.bullet.BulletSPI;
     uses dk.sdu.mmmi.cbse.common.services.IGameEventService;

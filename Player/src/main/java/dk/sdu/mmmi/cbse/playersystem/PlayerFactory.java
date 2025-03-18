@@ -10,11 +10,8 @@ import dk.sdu.mmmi.cbse.common.events.EntityDestroyedEvent;
 import dk.sdu.mmmi.cbse.common.services.IGameEventService;
 import dk.sdu.mmmi.cbse.common.services.IEntityFactory;
 import dk.sdu.mmmi.cbse.common.data.GameData;
+import javafx.scene.paint.Color;
 
-/**
- * Factory for creating player entities.
- * Replaces the Player subclass with a component-based approach.
- */
 public class PlayerFactory implements IEntityFactory<Entity> {
     private final IGameEventService eventService;
 
@@ -33,6 +30,13 @@ public class PlayerFactory implements IEntityFactory<Entity> {
         transform.setY(gameData.getDisplayHeight() / 2);
         transform.setRadius(8);
         player.addComponent(transform);
+
+        // Add renderer component
+        RendererComponent renderer = new RendererComponent();
+        renderer.setStrokeColor(Color.GREEN);
+        renderer.setStrokeWidth(2.0f);
+        renderer.setRenderLayer(500); // Player on top layer
+        player.addComponent(renderer);
 
         // Add player component with player-specific data
         PlayerComponent playerComponent = new PlayerComponent();
@@ -66,7 +70,7 @@ public class PlayerFactory implements IEntityFactory<Entity> {
         // Add collision response component
         CollisionResponseComponent response = new CollisionResponseComponent();
 
-        // Handle collision with hostile entities (enemies, enemy bullets)
+        // Handle collision with hostile entities
         response.addGroupResponse(CollisionGroup.HOSTILE, (self, other, world) -> {
             eventService.publish(new EntityDestroyedEvent(self, "Player destroyed by hostile entity"));
             playerComponent.setLives(playerComponent.getLives() - 1);
@@ -75,6 +79,7 @@ public class PlayerFactory implements IEntityFactory<Entity> {
             if (playerComponent.getLives() > 0) {
                 playerComponent.setInvulnerable(true);
                 playerComponent.setInvulnerabilityTimer(180); // 3 seconds at 60 FPS
+                renderer.setStrokeColor(Color.BLUE); // Visual indicator
                 return false;
             } else {
                 world.removeEntity(self);
@@ -82,7 +87,7 @@ public class PlayerFactory implements IEntityFactory<Entity> {
             }
         });
 
-        // Handle collision with obstacles (asteroids)
+        // Handle collision with obstacles
         response.addLayerResponse(CollisionLayer.OBSTACLE, (self, other, world) -> {
             eventService.publish(new EntityDestroyedEvent(self, "Player destroyed by obstacle"));
             playerComponent.setLives(playerComponent.getLives() - 1);
@@ -91,6 +96,7 @@ public class PlayerFactory implements IEntityFactory<Entity> {
             if (playerComponent.getLives() > 0) {
                 playerComponent.setInvulnerable(true);
                 playerComponent.setInvulnerabilityTimer(180); // 3 seconds at 60 FPS
+                renderer.setStrokeColor(Color.BLUE); // Visual indicator
                 return false;
             } else {
                 world.removeEntity(self);

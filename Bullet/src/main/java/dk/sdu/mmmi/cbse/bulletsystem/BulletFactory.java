@@ -8,15 +8,13 @@ import dk.sdu.mmmi.cbse.common.collision.CollisionLayer;
 import dk.sdu.mmmi.cbse.common.components.ShootingComponent;
 import dk.sdu.mmmi.cbse.common.components.TagComponent;
 import dk.sdu.mmmi.cbse.common.components.TransformComponent;
+import dk.sdu.mmmi.cbse.common.components.RendererComponent;
 import dk.sdu.mmmi.cbse.common.data.Entity;
 import dk.sdu.mmmi.cbse.common.data.EntityType;
 import dk.sdu.mmmi.cbse.common.data.GameData;
 import dk.sdu.mmmi.cbse.common.util.EntityBuilder;
+import javafx.scene.paint.Color;
 
-/**
- * Factory for creating bullet entities.
- * Implements the BulletSPI for bullet creation.
- */
 public class BulletFactory implements BulletSPI {
 
     @Override
@@ -61,6 +59,12 @@ public class BulletFactory implements BulletSPI {
             collision.addGroup(CollisionGroup.HOSTILE);
         }
 
+        // Create renderer component
+        RendererComponent renderer = new RendererComponent();
+        renderer.setStrokeColor(isPlayerBullet ? Color.YELLOW : Color.ORANGE);
+        renderer.setFillColor(isPlayerBullet ? Color.YELLOW : Color.ORANGE);
+        renderer.setRenderLayer(400); // Bullets above most entities but below player
+
         // Build the bullet entity using EntityBuilder
         return EntityBuilder.create()
                 .withType(EntityType.BULLET)
@@ -70,6 +74,7 @@ public class BulletFactory implements BulletSPI {
                 .withRadius(2)
                 .with(bulletComponent)
                 .with(collision)
+                .with(renderer)
                 .build();
     }
 }

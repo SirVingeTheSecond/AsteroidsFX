@@ -9,12 +9,14 @@ import dk.sdu.mmmi.cbse.common.components.CombatComponent;
 import dk.sdu.mmmi.cbse.common.components.BehaviorComponent;
 import dk.sdu.mmmi.cbse.common.components.TagComponent;
 import dk.sdu.mmmi.cbse.common.components.AIComponent;
+import dk.sdu.mmmi.cbse.common.components.RendererComponent;
 import dk.sdu.mmmi.cbse.common.enemy.EnemyBehavior;
 import dk.sdu.mmmi.cbse.common.enemy.EnemyProperties;
 import dk.sdu.mmmi.cbse.common.enemy.IEnemyFactory;
 import dk.sdu.mmmi.cbse.common.collision.CollisionComponent;
 import dk.sdu.mmmi.cbse.common.collision.CollisionGroup;
 import dk.sdu.mmmi.cbse.common.collision.CollisionLayer;
+import javafx.scene.paint.Color;
 
 import java.util.Random;
 
@@ -26,11 +28,34 @@ public class EnemyFactory implements IEnemyFactory {
         Entity enemy = new Entity();
 
         // Set shape, position and transform data
-        TransformComponent transform = enemy.getComponent(TransformComponent.class);
+        TransformComponent transform = new TransformComponent();
         transform.setPolygonCoordinates(5,-5, -10,0, 5,5);
         transform.setRadius(8);
         transform.setX(rnd.nextDouble() * gameData.getDisplayWidth());
         transform.setY(rnd.nextDouble() * gameData.getDisplayHeight());
+        enemy.addComponent(transform);
+
+        // Add renderer component with color based on behavior
+        RendererComponent renderer = new RendererComponent();
+        renderer.setRenderLayer(300); // Enemies above asteroids, below player
+
+        // Set color based on enemy type
+        switch (behavior) {
+            case PATROL:
+                renderer.setStrokeColor(Color.ORANGE);
+                break;
+            case AGGRESSIVE:
+                renderer.setStrokeColor(Color.RED);
+                break;
+            case DEFENSIVE:
+                renderer.setStrokeColor(Color.PURPLE);
+                break;
+            case SNIPER:
+                renderer.setStrokeColor(Color.DARKRED);
+                break;
+        }
+
+        enemy.addComponent(renderer);
 
         // Add behavior component
         enemy.addComponent(new BehaviorComponent(behavior));

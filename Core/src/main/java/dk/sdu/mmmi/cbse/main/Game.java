@@ -5,119 +5,131 @@ import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.input.Input;
 import dk.sdu.mmmi.cbse.common.services.*;
 import dk.sdu.mmmi.cbse.common.util.ServiceLocator;
+import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.ServiceLoader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * Main game class that initializes and manages the game.
+ * Main game application class.
+ * Initializes the game environment and manages the lifecycle.
  */
-public class Game {
+public class Game extends Application {
+    private static final Logger LOGGER = Logger.getLogger(Game.class.getName());
     private final GameData gameData = new GameData();
     private final World world = new World();
-    private final Pane gameWindow = new Pane();
-    private final Canvas gameCanvas;
-    private final Canvas debugCanvas;
-
-    private final List<IDebugService> debugServices;
-    private final List<IGamePluginService> plugins;
-    private final List<IEntityProcessingService> entityProcessors;
-    private final List<IPostEntityProcessingService> postProcessors;
-    private final List<IRenderSystem> renderSystems;
-    private final IGameEventService eventService;
-
     private GameLoop gameLoop;
 
-    public Game() {
-        // Create canvases for rendering
-        gameCanvas = new Canvas(gameData.getDisplayWidth(), gameData.getDisplayHeight());
-        debugCanvas = new Canvas(gameData.getDisplayWidth(), gameData.getDisplayHeight());
-        debugCanvas.setMouseTransparent(true);
-
-        // Add canvases to the window
-        gameWindow.getChildren().addAll(gameCanvas, debugCanvas);
-
-        // Get services using standardized approach
-        this.debugServices = loadServices(IDebugService.class);
-        this.plugins = loadServices(IGamePluginService.class);
-        this.entityProcessors = loadServices(IEntityProcessingService.class);
-        this.postProcessors = loadServices(IPostEntityProcessingService.class);
-        this.renderSystems = loadServices(IRenderSystem.class);
-        this.eventService = ServiceLocator.getService(IGameEventService.class);
-    }
-
-    /**
-     * Load services of a specific type
-     */
-    private <T> List<T> loadServices(Class<T> serviceType) {
-        return new ArrayList<>(ServiceLoader.load(serviceType)
-                .stream()
-                .map(ServiceLoader.Provider::get)
-                .toList());
-    }
-
-    /**
-     * Start the game
-     */
-    public void start(Stage window) {
-        // Setup game window
+    @Override
+    public void start(Stage primaryStage) {
+        // Create game window
+        Pane gameWindow = new Pane();
         gameWindow.setPrefSize(gameData.getDisplayWidth(), gameData.getDisplayHeight());
         gameWindow.setStyle("-fx-background-color: black;");
 
+        // Create game canvas
+        Canvas gameCanvas = new Canvas(gameData.getDisplayWidth(), gameData.getDisplayHeight());
+        gameWindow.getChildren().add(gameCanvas);
+
+        // Setup scene
         Scene scene = new Scene(gameWindow);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Asteroids ECS");
+        primaryStage.setResizable(false);
 
-        // Setup input system
-        scene.setOnKeyPressed(Input.createKeyboardHandler());
-        scene.setOnKeyReleased(Input.createKeyboardHandler());
+        // Setup input handling
+        setupInput(scene);
 
-        // Setup mouse input
-        scene.setOnMouseMoved(event -> {
-            Input.setAxis("MouseX", (float) event.getX());
-            Input.setAxis("MouseY", (float) event.getY());
-        });
+        // Create the game loop
+        gameLoop = new GameLoop(gameData, world, gameCanvas.getGraphicsContext2D());
 
-        // Start all plugins
-        for (IGamePluginService plugin : plugins) {
-            plugin.start(gameData, world);
-        }
+        // Start all game plugins using ServiceLocator
+        List<IGamePluginService> plugins = ServiceLocator.locateAll(IGamePluginService.class);
+        LOGGER.log(Level.INFO, "Starting {0} game plugins", plugins.size());
+        plugins.forEach(plugin -> plugin.start(gameData, world));
 
-        // Create game loop
-        gameLoop = new GameLoop(
-                gameData,
-                world,
-                gameCanvas.getGraphicsContext2D(),
-                entityProcessors,
-                postProcessors,
-                renderSystems,
-                eventService
-        );
-
-        // Setup window
-        window.setScene(scene);
-        window.setTitle("Asteroids");
-        window.show();
+        // Show the window
+        primaryStage.show();
 
         // Start the game loop
         gameLoop.start();
     }
 
-    /**
-     * Stop the game
-     */
+    @Override
     public void stop() {
-        // Stop game loop
+        // Stop the game loop
         if (gameLoop != null) {
             gameLoop.stop();
         }
 
-        // Stop all plugins
-        for (IGamePluginService plugin : plugins) {
-            plugin.stop(gameData, world);
+        // Stop all game plugins
+        List<IGamePluginService> plugins = ServiceLocator.locateAll(IGamePluginService.class);
+        LOGGER.log(Level.INFO, "Stopping {0} game plugins", plugins.size());
+        plugins.forEach(plugin -> plugin.stop(gameData, world));
+    }
+
+    /**
+     * Setup input handling for the game.
+     */
+    private void setupInput(Scene scene) {
+        // Map JavaFX key events to our input system
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, e -> {
+            Input.KeyCode code = mapKeyCode(e.getCode());
+            if (code != null) {
+                Input.setKey(code, true);
+            }
+
+            // Toggle debug mode with F3
+            if (e.getCode() == KeyCode.F3) {
+                gameData.setDebugMode(!gameData.isDebugMode());
+            }
+        });
+
+        scene.addEventHandler(KeyEvent.KEY_RELEASED, e -> {
+            Input.KeyCode code = mapKeyCode(e.getCode());
+            if (code != null) {
+                Input.setKey(code, false);
+            }
+        });
+
+        // Handle mouse events
+        scene.setOnMouseMoved(e -> {
+            Input.setAxis(Input.AxisName.MOUSEX, (float) e.getX());
+            Input.setAxis(Input.AxisName.MOUSEY, (float) e.getY());
+        });
+    }
+
+    /**
+     * Map JavaFX key codes to our input system's key codes.
+     */
+    private Input.KeyCode mapKeyCode(KeyCode code) {
+        switch (code) {
+            case UP:    return Input.KeyCode.UP;
+            case DOWN:  return Input.KeyCode.DOWN;
+            case LEFT:  return Input.KeyCode.LEFT;
+            case RIGHT: return Input.KeyCode.RIGHT;
+            case SPACE: return Input.KeyCode.SPACE;
+            case ESCAPE: return Input.KeyCode.ESCAPE;
+            case W:     return Input.KeyCode.W;
+            case A:     return Input.KeyCode.A;
+            case S:     return Input.KeyCode.S;
+            case D:     return Input.KeyCode.D;
+            // Map other keys as needed
+            default:    return null;
         }
+    }
+
+    /**
+     * Launch the game application.
+     */
+    public static void main(String[] args) {
+        launch(args);
     }
 }

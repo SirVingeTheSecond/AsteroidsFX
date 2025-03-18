@@ -16,4 +16,14 @@ public interface IRenderSystem {
      * @param world Game world containing entities
      */
     void render(GraphicsContext gc, GameData gameData, World world);
+
+    /**
+     * Get the priority of this render system.
+     * Higher priority systems render later (on top).
+     *
+     * @return Render priority
+     */
+    default int getPriority() {
+        return 0;
+    }
 }

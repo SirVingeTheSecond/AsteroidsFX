@@ -7,6 +7,7 @@ module Core {
     requires spring.beans;
     requires java.desktop;
     requires CommonCollision;
+    requires java.logging;
 
     exports dk.sdu.mmmi.cbse.main;
 
