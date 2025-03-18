@@ -3,17 +3,23 @@ package dk.sdu.mmmi.cbse.common.input;
 import java.util.EnumMap;
 
 /**
- * Input system with KeyCode enum.
- * Reminding a lot of Unity's input system lol
+ * Standardized input system with Unity-like functionality.
+ * Provides consistent access to keyboard state and virtual axes.
  */
 public class Input {
-    // All possible key codes
+    /**
+     * Enumeration of supported key codes
+     */
     public enum KeyCode {
         UP, DOWN, LEFT, RIGHT,
         SPACE, ESCAPE, ENTER, TAB,
         A, B, C, D, E, F, G, H, I, J, K, L, M,
         N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
         F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12
+    }
+
+    public enum AxisName {
+        HORIZONTAL, VERTICAL, MOUSEX, MOUSEY
     }
 
     // Current key states
@@ -23,7 +29,7 @@ public class Input {
     private static final EnumMap<KeyCode, Boolean> previousKeyStates = new EnumMap<>(KeyCode.class);
 
     // Axis values (for analog input like mouse)
-    private static final EnumMap<String, Float> axisValues = new EnumMap<>(String.class);
+    private static final EnumMap<AxisName, Float> axisValues = new EnumMap<>(AxisName.class);
 
     static {
         // Initialize all keys to not pressed
@@ -33,10 +39,10 @@ public class Input {
         }
 
         // Initialize default axes
-        axisValues.put("Horizontal", 0f);
-        axisValues.put("Vertical", 0f);
-        axisValues.put("MouseX", 0f);
-        axisValues.put("MouseY", 0f);
+        axisValues.put(AxisName.valueOf("Horizontal"), 0f);
+        axisValues.put(AxisName.valueOf("Vertical"), 0f);
+        axisValues.put(AxisName.valueOf("MouseX"), 0f);
+        axisValues.put(AxisName.valueOf("MouseY"), 0f);
     }
 
     /**
@@ -64,7 +70,7 @@ public class Input {
      * @param value The value of the axis (-1 to 1)
      */
     public static void setAxis(String axisName, float value) {
-        axisValues.put(axisName, value);
+        axisValues.put(AxisName.valueOf(axisName), value);
     }
 
     /**
@@ -99,7 +105,7 @@ public class Input {
      * @param axisName The name of the axis
      * @return The value of the axis (-1 to 1)
      */
-    public static float getAxis(String axisName) {
+    public static float getAxis(AxisName axisName) {
         return axisValues.getOrDefault(axisName, 0f);
     }
 
@@ -138,9 +144,9 @@ public class Input {
             case F1: return KeyCode.F1;
             case F2: return KeyCode.F2;
             case F3: return KeyCode.F3;
-
+            // Add more key mappings as needed
             default:
-                // Try to map letter keys (a bit hacky)
+                // Try to map letter keys
                 if (javafxKey.isLetterKey()) {
                     try {
                         return KeyCode.valueOf(javafxKey.name());
