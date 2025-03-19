@@ -11,16 +11,12 @@ import javafx.scene.canvas.GraphicsContext;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Main rendering system that renders all entities with RendererComponent.
  * Uses a Unity-like approach with layer-based rendering and Vector2D for transformations.
  */
 public class DefaultRenderSystem implements IRenderSystem {
-    private static final Logger LOGGER = Logger.getLogger(DefaultRenderSystem.class.getName());
-
     // Cache for entity layers to avoid sorting every frame
     private final Map<Integer, List<Entity>> layerMap = new HashMap<>();
     private final Map<String, List<Vector2D>> transformedPointsCache = new ConcurrentHashMap<>();

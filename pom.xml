@@ -11,21 +11,22 @@
     </repositories>
 
     <modules>
-        <module>Core</module>
-        <module>Common</module>
-        <module>Player</module>
-        <module>Bullet</module>
-        <module>CommonBullet</module>
-        <module>CommonAsteroids</module>
         <module>Asteroids</module>
+        <module>Bullet</module>
         <module>Collision</module>
-        <module>Enemy</module>
-        <module>Movement</module>
+        <module>Common</module>
+        <module>CommonAsteroids</module>
+        <module>CommonBullet</module>
         <module>CommonCollision</module>
         <module>CommonEnemy</module>
-        <module>Renderer</module>
+        <module>Core</module>
+        <module>Enemy</module>
         <module>Health</module>
+        <module>Movement</module>
+        <module>Player</module>
+        <module>Renderer</module>
     </modules>
+
     <properties>
         <java>java</java>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>        
